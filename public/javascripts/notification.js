@@ -1,3 +1,15 @@
-console.log("test");
+// 즉시실행함수 IIFE
+async function renderNoti() {
+  console.log('renderNoti')
+  const orderList = data.data.data.map(
+    (order) => order.productOrder.productOption
+  )
+  orderList.forEach((orderProductOption) => {
+    console.log(orderProductOption)
+    document.querySelector('.main').innerHTML += orderProductOption + '<br>'
+  })
+}
 
-setInterval(() => {}, 1000);
+function setDelay(i) {
+  setTimeout(function () {}, 1000 * i)
+}

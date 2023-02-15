@@ -3,21 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>헬로 월드!</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <h1>헬로 월드!</h1>
-    이 애플리케이션은 node
-    <script>
-      document.write(process.version);
-    </script>
-    , Chrome
-    <script>
-      document.write(process.versions.chrome);
-    </script>
-    , Electron
-    <script>
-      document.write(process.versions.electron);
-    </script>
-    을 사용합니다.
-  </body>
+    <h1 id="headline">헬로 월드!</h1>
+  <script>
+    
+     document.querySelector('#headline').innerText = test[0]
+  </script>
 </html>

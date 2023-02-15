@@ -1,12 +1,11 @@
 @font-face {
-  font-family: "bitbit";
-  src: url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff"),
-    url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2");
+  font-family: 'bitbit';
+  src: url('//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff'),
+    url('//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2');
 }
 
 * {
-  font-family: "bitbit";
-  background-color: #00ff37;
+  font-family: 'bitbit';
 }
 .main {
   width: 1920;

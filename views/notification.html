@@ -4,19 +4,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%=title %></title>
+    <title>Notification Overay</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="css/notification.css" />
   </head>
   <body>
-    <div class="main">
-      <div class="notiCard">
-        <img src="images/handsup.png" alt="" />
-        <div class="text">
-          <p><span id="nickname">칠성사이다</span> 님</p>
-          <p><span id="count">123</span> 개 구매 감사합니다</p>
-        </div>
-      </div>
-    </div>
+    <div class="main"></div>
   </body>
+
   <script src="javascripts/notification.js"></script>
 </html>
