@@ -1,0 +1,38 @@
+@font-face {
+  font-family: "bitbit";
+  src: url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff"),
+    url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2");
+}
+
+* {
+  font-family: "bitbit";
+  background-color: #00ff37;
+}
+.main {
+  width: 1920;
+  height: 1080;
+}
+
+.notiCard {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  width: fit-content;
+}
+
+.notiCard img {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.main .notiCard .text p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 56px;
+  font-weight: 500;
+  text-shadow: -2px 0px white, 0px 2px white, 2px 0px white, 0px -2px white;
+}

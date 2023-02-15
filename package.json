@@ -1,0 +1,53 @@
+{
+  "name": "smartstorenoti",
+  "version": "1.0.0",
+  "description": "smartstore에서 구매기록을 가져오는 프로그램 입니다",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "deploy": "electron-builder --win nsis:x64"
+  },
+  "build": {
+    "productName": "test",
+    "appId": "com.electron.hello",
+    "asar": true,
+    "protocols": {
+      "name": "test",
+      "schemes": [
+        "test"
+      ]
+    },
+    "win": {
+      "target": [
+        "zip",
+        "nsis"
+      ],
+      "icon": "./resources/installer/Icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": "."
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "^4.18.2",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "electron-builder": "^23.6.0",
+    "electron": "v22.1.0"
+  }
+}
