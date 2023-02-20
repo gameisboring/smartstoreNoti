@@ -1,5 +1,9 @@
 {
   "CLIENT_ID": "6Xnlngu2HpRdZWXybYw59T",
   "CLIENT_SECRET": "$2a$04$K6cI3Wkdsrc7A1M1fsI4OO",
-  "PORT": "3000"
+  "DATE": "2023-01-27 00:00:00",
+  "PORT": "3000",
+  "NICK_OPT": "아프리카닉네임",
+  "TEXT_OPT": "사이즈",
+  "test": ""
 }

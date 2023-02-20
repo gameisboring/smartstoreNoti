@@ -2,17 +2,13 @@ const bcrypt = require('bcrypt')
 const http = require('https')
 const axios = require('axios').default
 const API = require('./config/ApiConfig.json')
-
 const clientId = API.CLIENT_ID
 const clientSecret = API.CLIENT_SECRET
 const timestamp = new Date().getTime() - 1000
-
-// 밑줄로 연결하여 password 생성
 const password = `${clientId}_${timestamp}`
-// bcrypt 해싱
-const hashed = bcrypt.hashSync(password, clientSecret)
-// base64 인코딩
-const clientSecretSign = Buffer.from(hashed, 'utf-8').toString('base64')
+const { createhashedSign } = require('./hash')
+
+const clientSecretSign = createhashedSign(password, clientSecret)
 
 module.exports = class ApiControls {
   /**
@@ -39,7 +35,8 @@ module.exports = class ApiControls {
           resolve(response.data.access_token)
         })
         .catch(function (error) {
-          reject(error)
+          console.log('getOauthTokenToAxios', error)
+          resolve(false)
         })
     })
   }
@@ -50,6 +47,10 @@ module.exports = class ApiControls {
    */
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
+    const nowTime = API.DATE ? API.DATE : new Date().toString()
+    if (!oauthToken) {
+      return false
+    }
     return new Promise((resolve, reject) => {
       axios({
         method: 'get',
@@ -60,19 +61,25 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          lastChangedFrom: new Date('2023-01-27 00:00:00').toString(),
+          lastChangedFrom: new Date(nowTime).toString(),
         },
-      }).then(function (response) {
-        const mappedData = response.data.data.lastChangeStatuses.map(
-          (change) => change.productOrderId
-        )
-        resolve(mappedData)
       })
+        .then(function (response) {
+          // const mappedData = response.data.data.lastChangeStatuses
+          const mappedData = response.data.data.lastChangeStatuses.map(
+            (change) => change.productOrderId
+          )
+          resolve(mappedData)
+        })
+        .catch(function (error) {
+          console.error('getChangeList', error)
+          resolve(false)
+        })
     })
   }
 
   /**
-   * 주문 내역 조회
+   * get Order List
    */
   async getOrderList() {
     const orderList = await this.getChangeList()
@@ -89,15 +96,27 @@ module.exports = class ApiControls {
         data: {
           productOrderIds: orderList,
         },
-      }).then(function (response) {
-        console.log(response.data)
-        resolve(response.data)
       })
+        .then(function (response) {
+          const mappedData = response.data.data.map((productOrder) => {
+            const options = productOrder.productOrder.productOption.split('/')
+            return {
+              nick: options[0].split(API.NICK_OPT + ': ')[1],
+              text: options[1].split(API.TEXT_OPT + ': ')[1],
+              productName: productOrder.productOrder.productName,
+            }
+          })
+          resolve(mappedData)
+        })
+        .catch(function (error) {
+          console.error('getChangeList', error)
+          resolve(error)
+        })
     })
   }
 
   /**
-   * 사용안함
+   * NO Use
    */
   async getSellerChannelInfo() {
     const productsList = await this.getProductList()

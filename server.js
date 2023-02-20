@@ -37,6 +37,11 @@ app2.get('/order', async function (req, res) {
   res.send(dataList)
 })
 
+app2.get('/order', async function (req, res) {
+  const dataList = await api.getOrderListWithInfo()
+  res.send(dataList)
+})
+
 io.on('connection', function (socket) {
   console.log(socket.id, 'Connected')
 
