@@ -18,7 +18,8 @@ app2.get('/', function (req, res) {
   res.end('{"testcode":"200", "text":"Electorn Test~"}')
 })
 
-app2.get('/notification', function (req, res) {
+app2.get('/notification', async function (req, res) {
+  io.emit('orderList', await api.getOrderList())
   res.sendFile(__dirname + '/views/notification.html')
 })
 
@@ -34,11 +35,7 @@ app2.get('/change', async function (req, res) {
 
 app2.get('/order', async function (req, res) {
   const dataList = await api.getOrderList()
-  res.send(dataList)
-})
 
-app2.get('/order', async function (req, res) {
-  const dataList = await api.getOrderListWithInfo()
   res.send(dataList)
 })
 
@@ -47,10 +44,10 @@ io.on('connection', function (socket) {
 
   socket.emit('msg', `${socket.id} 연결 되었습니다.`)
 
-  socket.on('msg', function (data) {
-    console.log(socket.id, data)
-
-    socket.emit('msg', `Server : "${data}" 받았습니다.`)
+  socket.on('orderList', (msg) => {
+    setInterval(async () => {
+      socket.emit('orderList', await api.getOrderList())
+    }, 3000)
   })
 })
 
