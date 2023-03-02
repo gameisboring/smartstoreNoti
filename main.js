@@ -1,10 +1,32 @@
 const electron = require('electron')
-// express 서버
-const { app2 } = require('./server')
+const ipcMain = electron.ipcMain
+const fs = require('fs')
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const elApp = electron.app
+const apiSchema = {
+  CLIENT_ID: '',
+  CLIENT_SECRET: '',
+  ACCOUNT_ID: '',
+  NICK_OPT: '아프리카닉네임',
+  TEXT_OPT: '메세지',
+}
+
+if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
+  fs.writeFileSync(
+    elApp.getPath('userData') + '/APIconfig.json',
+    JSON.stringify(apiSchema)
+  )
+}
+
+// express 서버
+const { app2 } = require('./server')
+
 // 네이티브 브라우저 창을 만드는 모듈.
 const { BrowserWindow } = electron
+
+console.log(elApp.getPath('home'))
+console.log(elApp.getPath('appData'))
+console.log(elApp.getPath('userData'))
 
 // 윈도우 객체를 전역에 유지합니다. 만약 이렇게 하지 않으면
 // 자바스크립트 GC가 일어날 때 창이 멋대로 닫혀버립니다.
@@ -22,7 +44,7 @@ function createWindow() {
   win.loadURL(`file://${__dirname}/client.html`)
 
   // 개발자 도구를 엽니다.
-  //   win.webContents.openDevTools();
+  win.webContents.openDevTools()
 
   // 창이 닫히면 호출됩니다.
   win.on('closed', () => {

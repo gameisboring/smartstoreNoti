@@ -54,19 +54,62 @@
   </head>
   <body>
     <form action="" method="post" id="configInputForm">
-      <h1 id="headline">헬로 월드!</h1>
+      <h1 id="headline">API 설정</h1>
       <div class="inputGroup">
         <span>Client ID</span>
-        <input type="text" name="clientId" id="" />
+        <input type="text" name="CLIENT_ID" id="CLIENT_ID" />
       </div>
       <div class="inputGroup">
         <span>Client Secret</span>
-        <input type="text" name="clientSecret" id="" />
+        <input type="text" name="CLIENT_SECRET" id="CLIENT_SECRET" />
+      </div>
+      <div class="inputGroup">
+        <span>Account ID</span>
+        <input type="text" name="ACCOUNT_ID" id="ACCOUNT_ID" />
+      </div>
+      <div class="inputGroup">
+        <span>NICK_OPT</span>
+        <input type="text" name="NICK_OPT" id="NICK_OPT" />
+      </div>
+      <div class="inputGroup">
+        <span>TEXT_OPT</span>
+        <input type="text" name="TEXT_OPT" id="TEXT_OPT" />
       </div>
       <input type="submit" value="SAVE" />
     </form>
   </body>
   <script>
-    document.querySelector('#headline').innerText = 'javascript is working'
+    const form = document.querySelector('#configInputForm')
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      let response = await fetch('http://localhost:3000/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          CLIENT_ID: document.getElementById('CLIENT_ID').value,
+          CLIENT_SECRET: document.getElementById('CLIENT_SECRET').value,
+          ACCOUNT_ID: document.getElementById('ACCOUNT_ID').value,
+          NICK_OPT: document.getElementById('NICK_OPT').value,
+          TEXT_OPT: document.getElementById('TEXT_OPT').value,
+        }),
+      })
+
+      let result = await response.json()
+
+      alert(result.message)
+    })
+
+    fetch('http://localhost:3000/config')
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelector('#CLIENT_ID').value = data.CLIENT_ID
+        document.querySelector('#CLIENT_SECRET').value = data.CLIENT_SECRET
+        document.querySelector('#ACCOUNT_ID').value = data.ACCOUNT_ID
+        document.querySelector('#NICK_OPT').value = data.NICK_OPT
+        document.querySelector('#TEXT_OPT').value = data.TEXT_OPT
+      })
   </script>
 </html>

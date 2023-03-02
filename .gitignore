@@ -2,3 +2,4 @@
 /dist
 /config/**
 !/config/ApiConfig.json
+/example.js

@@ -1,14 +1,17 @@
+const electron = require('electron')
+const elApp = electron.app
+const userDataPath = elApp.getPath('userData')
 const fs = require('fs')
 const axios = require('axios').default
-const API = require('./config/ApiConfig.json')
-// const API = JSON.parse(fs.readFileSync('./config/ApiConfig.json', 'utf-8'))
-const { createhashedSign } = require('./hash')
-const { toString } = require('./server')
-const clientId = API.CLIENT_ID
-const clientSecret = API.CLIENT_SECRET
 
+// const API = require(userDataPath + '/APIconfig.json')
+const { createhashedSign } = require('./hash')
+
+/**
+ * TODO
+ */
 const listFileName = `${dateFormat(new Date())}_list.json`
-let listFileUrl = `./config/${listFileName}`
+let listFileUrl = elApp.getPath('userData')
 
 try {
   fs.readFileSync(listFileUrl)
@@ -45,15 +48,23 @@ module.exports = class ApiControls {
         baseURL: 'https://api.commerce.naver.com',
         headers: 'application/x-www-form-urlencoded',
         params: {
-          client_id: clientId,
-          timestamp: new Date().getTime() - 5000,
+          client_id: JSON.parse(
+            fs.readFileSync(userDataPath + '/APIconfig.json')
+          ).CLIENT_ID,
+          timestamp: new Date().getTime() - 3000,
           client_secret_sign: createhashedSign(
-            `${clientId}_${new Date().getTime() - 5000}`,
-            clientSecret
+            `${
+              JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
+                .CLIENT_ID
+            }_${new Date().getTime() - 3000}`,
+            JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
+              .CLIENT_SECRET
           ),
           grant_type: 'client_credentials',
           type: 'SELF',
-          account_id: 'nfun00',
+          account_id: JSON.parse(
+            fs.readFileSync(userDataPath + '/APIconfig.json')
+          ).ACCOUNT_ID,
         },
       })
         .then(function (response) {
@@ -173,8 +184,14 @@ module.exports = class ApiControls {
           const mappedData = response.data.data.map((productOrder) => {
             const options = productOrder.productOrder.productOption.split('/')
             return {
-              nick: options[0].split(API.NICK_OPT + ': ')[1],
-              text: options[1].split(API.TEXT_OPT + ': ')[1],
+              nick: options[0].split(
+                JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
+                  .NICK_OPT + ': '
+              )[1],
+              text: options[1].split(
+                JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
+                  .TEXT_OPT + ': '
+              )[1],
               streamerName: productOrder.productOrder.productName
                 .match(/\[(.*?)\]/g)
                 .map((match) => match.slice(1, -1))[0],
@@ -184,7 +201,7 @@ module.exports = class ApiControls {
           resolve(mappedData)
         })
         .catch(function (error) {
-          console.error('getChangeList', error)
+          console.error('getChangeList', error.response.data)
           resolve(error)
         })
     })
