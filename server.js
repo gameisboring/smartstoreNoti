@@ -44,10 +44,8 @@ io.on('connection', function (socket) {
 
   socket.emit('msg', `${socket.id} 연결 되었습니다.`)
 
-  socket.on('orderList', (msg) => {
-    setInterval(async () => {
-      socket.emit('orderList', await api.getOrderList())
-    }, 3000)
+  socket.on('orderList', async (msg) => {
+    socket.emit('orderList', await api.getOrderList())
   })
 })
 

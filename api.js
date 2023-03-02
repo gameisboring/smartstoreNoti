@@ -1,14 +1,11 @@
-const bcrypt = require('bcrypt')
-const http = require('https')
 const fs = require('fs')
 const axios = require('axios').default
 const API = require('./config/ApiConfig.json')
 // const API = JSON.parse(fs.readFileSync('./config/ApiConfig.json', 'utf-8'))
 const { createhashedSign } = require('./hash')
+const { toString } = require('./server')
 const clientId = API.CLIENT_ID
 const clientSecret = API.CLIENT_SECRET
-const password = `${clientId}_${new Date().getTime() - 5000}`
-const clientSecretSign = createhashedSign(password, clientSecret)
 
 const listFileName = `${dateFormat(new Date())}_list.json`
 let listFileUrl = `./config/${listFileName}`
@@ -50,18 +47,27 @@ module.exports = class ApiControls {
         params: {
           client_id: clientId,
           timestamp: new Date().getTime() - 5000,
-          client_secret_sign: clientSecretSign,
+          client_secret_sign: createhashedSign(
+            `${clientId}_${new Date().getTime() - 5000}`,
+            clientSecret
+          ),
           grant_type: 'client_credentials',
           type: 'SELF',
           account_id: 'nfun00',
         },
       })
         .then(function (response) {
-          console.log(response.data.expires_in)
+          console.log(
+            'OAuth Token Expires in',
+            `${Math.floor(response.data.expires_in / 60)}분 ${
+              response.data.expires_in % 60
+            }초`
+          )
           resolve(response.data.access_token)
         })
         .catch(function (error) {
-          console.log('getOauthTokenToAxios', error)
+          console.log('getOauthTokenToAxios', error.response.data)
+
           resolve(false)
         })
     })

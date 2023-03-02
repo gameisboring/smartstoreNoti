@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt')
-const API = require('./config/ApiConfig.json')
 // 밑줄로 연결하여 password 생성
 
 // bcrypt 해싱
