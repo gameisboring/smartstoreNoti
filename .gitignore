@@ -3,3 +3,4 @@
 /config/**
 !/config/ApiConfig.json
 /example.js
+/test

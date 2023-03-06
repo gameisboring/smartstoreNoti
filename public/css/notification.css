@@ -7,5 +7,26 @@
 }
 
 * {
+  text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000;
+  /* -webkit-text-stroke: 1px black; */
+
   font-family: 'KCC-Ganpan';
+}
+
+.msgText {
+  font-size: 28px;
+}
+
+.nick {
+  color: white;
+}
+.quantity {
+  color: white;
+}
+.productName {
+  color: white;
+}
+.point {
+  font-size: 45px;
+  color: red;
 }

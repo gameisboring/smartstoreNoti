@@ -8,6 +8,7 @@ const app2 = express()
 const server = app2.listen(PORT, function () {
   console.log(`Server Running on ${PORT} Port`)
 })
+const example = require('./example')
 
 app2.use(express.json())
 app2.use(express.urlencoded({ extended: false }))
@@ -37,7 +38,7 @@ app2.get('/test', async function (req, res) {
 
 app2.get('/change', async function (req, res) {
   const dataList = await api.getChangeList()
-  res.send(dataList)
+  res.json(dataList)
 })
 
 app2.get('/order', async function (req, res) {
@@ -65,6 +66,18 @@ app2.post('/config', function (req, res) {
   } else {
     res.json({ message: '입력에 실패했습니다' })
   }
+})
+
+app2.get('/noti/image', function (req, res) {
+  if (fs.existsSync(elApp.getPath('userData') + '/noti.png')) {
+    res.sendFile(elApp.getPath('userData') + '/noti.png')
+  } else {
+    res.sendFile(__dirname + '/public/images/handsup.png')
+  }
+})
+
+app2.get('/ex/1', function (req, res) {
+  res.send(example.notiData)
 })
 
 io.on('connection', function (socket) {

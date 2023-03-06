@@ -68,12 +68,24 @@
         <input type="text" name="ACCOUNT_ID" id="ACCOUNT_ID" />
       </div>
       <div class="inputGroup">
-        <span>NICK_OPT</span>
+        <span>닉네임 옵션이름</span>
         <input type="text" name="NICK_OPT" id="NICK_OPT" />
       </div>
       <div class="inputGroup">
-        <span>TEXT_OPT</span>
+        <span>메세지 옵션이름</span>
         <input type="text" name="TEXT_OPT" id="TEXT_OPT" />
+      </div>
+      <div class="inputGroup">
+        <span>사이즈 옵션이름</span>
+        <input type="text" name="SIZE_OPT" id="SIZE_OPT" />
+      </div>
+      <div class="inputGroup">
+        <span>BJ 옵션이름</span>
+        <input type="text" name="BJ_OPT" id="BJ_OPT" />
+      </div>
+      <div class="inputGroup">
+        <span>점수 옵션이름</span>
+        <input type="text" name="POINT_OPT" id="POINT_OPT" />
       </div>
       <input type="submit" value="SAVE" />
     </form>
@@ -94,6 +106,9 @@
           ACCOUNT_ID: document.getElementById('ACCOUNT_ID').value,
           NICK_OPT: document.getElementById('NICK_OPT').value,
           TEXT_OPT: document.getElementById('TEXT_OPT').value,
+          SIZE_OPT: document.getElementById('SIZE_OPT').value,
+          BJ_OPT: document.getElementById('BJ_OPT').value,
+          POINT_OPT: document.getElementById('POINT_OPT').value,
         }),
       })
 
@@ -110,6 +125,9 @@
         document.querySelector('#ACCOUNT_ID').value = data.ACCOUNT_ID
         document.querySelector('#NICK_OPT').value = data.NICK_OPT
         document.querySelector('#TEXT_OPT').value = data.TEXT_OPT
+        document.querySelector('#SIZE_OPT').value = data.SIZE_OPT
+        document.querySelector('#BJ_OPT').value = data.BJ_OPT
+        document.querySelector('#POINT_OPT').value = data.POINT_OPT
       })
   </script>
 </html>

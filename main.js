@@ -11,10 +11,56 @@ const apiSchema = {
   TEXT_OPT: '메세지',
 }
 
-if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
+function dateFormat(date) {
+  let month = date.getMonth() + 1
+  let day = date.getDate()
+
+  month = month >= 10 ? month : '0' + month
+  day = day >= 10 ? day : '0' + day
+
+  return date.getFullYear() + '-' + month + '-' + day
+}
+
+if (!fs.readFileSync(elApp.getPath('userData') + '/APIconfig.json')) {
   fs.writeFileSync(
     elApp.getPath('userData') + '/APIconfig.json',
     JSON.stringify(apiSchema)
+  )
+}
+
+try {
+  fs.readdirSync(elApp.getPath('userData') + '/list')
+} catch (error) {
+  console.log(`folder making .... ${elApp.getPath('userData')}/list`)
+  fs.mkdirSync(elApp.getPath('userData') + '/list')
+}
+
+try {
+  !fs.readFileSync(
+    elApp.getPath('userData') + '/list' + `/${dateFormat(new Date())}_list.json`
+  )
+} catch {
+  console.log(`file writing .... ${dateFormat(new Date())}_list.json`)
+  fs.writeFileSync(
+    elApp.getPath('userData') +
+      '/list' +
+      `/${dateFormat(new Date())}_list.json`,
+    '[]'
+  )
+}
+
+try {
+  !fs.readFileSync(
+    elApp.getPath('userData') +
+      '/list' +
+      `/${dateFormat(new Date())}_pointList.json`
+  )
+} catch {
+  fs.writeFileSync(
+    elApp.getPath('userData') +
+      '/list' +
+      `/${dateFormat(new Date())}_pointList.json`,
+    '[]'
   )
 }
 

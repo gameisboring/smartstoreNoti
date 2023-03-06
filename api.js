@@ -1,29 +1,17 @@
 const electron = require('electron')
 const elApp = electron.app
 const userDataPath = elApp.getPath('userData')
-const fs = require('fs')
+const fs = require('fs').promises
 const axios = require('axios').default
 
 // const API = require(userDataPath + '/APIconfig.json')
 const { createhashedSign } = require('./hash')
-
-/**
- * TODO
- */
-const listFileName = `${dateFormat(new Date())}_list.json`
-let listFileUrl = elApp.getPath('userData')
-
-try {
-  fs.readFileSync(listFileUrl)
-} catch (error) {
-  const data = []
-  console.error(
-    `There no  ${listFileName} file. create new file ${listFileName}`
-  )
-  fs.writeFileSync(listFileUrl, JSON.stringify(data)) // 파일 생성
-}
-
-const orderedList = require(listFileUrl)
+// 2023-01-01_list.json
+let listFileName = `/${dateFormat(new Date())}_list.json`
+// 2023-01-01_pointList.json
+let pointListFileName = `/${dateFormat(new Date())}_pointList.json`
+//  appdata/roaming/projectName
+let listFileUrl = elApp.getPath('userData') + '/list'
 
 function dateFormat(date) {
   let month = date.getMonth() + 1
@@ -35,36 +23,31 @@ function dateFormat(date) {
   return date.getFullYear() + '-' + month + '-' + day
 }
 
+console.log(dateFormat(new Date()))
+
 module.exports = class ApiControls {
   /**
    * Get Access Token from NaverCommerce API Center with Axios
    * @returns (String) access_token
    */
   async getOauthTokenToAxios() {
-    return new Promise((resolve, reject) => {
-      axios({
+    const API = await this.getAPIconfig()
+    return new Promise(async (resolve, reject) => {
+      await axios({
         method: 'post',
         url: '/external/v1/oauth2/token',
         baseURL: 'https://api.commerce.naver.com',
         headers: 'application/x-www-form-urlencoded',
         params: {
-          client_id: JSON.parse(
-            fs.readFileSync(userDataPath + '/APIconfig.json')
-          ).CLIENT_ID,
+          client_id: API.CLIENT_ID,
           timestamp: new Date().getTime() - 3000,
-          client_secret_sign: createhashedSign(
-            `${
-              JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
-                .CLIENT_ID
-            }_${new Date().getTime() - 3000}`,
-            JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
-              .CLIENT_SECRET
+          client_secret_sign: await createhashedSign(
+            `${API.CLIENT_ID}_${new Date().getTime() - 3000}`,
+            API.CLIENT_SECRET
           ),
           grant_type: 'client_credentials',
           type: 'SELF',
-          account_id: JSON.parse(
-            fs.readFileSync(userDataPath + '/APIconfig.json')
-          ).ACCOUNT_ID,
+          account_id: API.ACCOUNT_ID,
         },
       })
         .then(function (response) {
@@ -88,24 +71,65 @@ module.exports = class ApiControls {
    * Compare to Existing Order List
    */
   async compareExOrderList(mappedData) {
+    // 새로운 주문 넣을 빈 배열
     let newOrders = []
-
+    // 기존에 작성되어있는 Array 타입 JSON 파일
+    let orderedList = JSON.parse(
+      await fs.readFile(listFileUrl + listFileName, 'utf-8')
+    )
+    let pointList = JSON.parse(
+      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
+    )
+    // 파라미터로 넘어온 데이터 순회하며 중복조회
     for (var i in mappedData) {
-      var result = orderedList.filter((order) => order.orderId == mappedData[i])
-      // console.log(mappedData[i], result.length == 0)
+      var result = orderedList.filter(
+        // productOrderId 중복이면 필터링
+        (order) => order.orderId == mappedData[i].productOrderId
+      )
 
-      // 이전 기록과 비교해서 겹치는 게 없을 때
-      if (result.length == 0) {
-        console.log('::::: New Payment Detected!!!!', mappedData[i])
-        const result = orderedList.push({
-          no: orderedList.length,
-          orderId: mappedData[i],
+      var pointResult = pointList.filter(
+        // productOrderId 중복이면 필터링
+        (order) => order.orderId == mappedData[i].productOrderId
+      )
+
+      if (pointResult.length == 0) {
+        // 불러온 포인트 리스트에 데이터 추가
+        pointList.push({
+          no: pointList.length,
+          orderId: mappedData[i].productOrderId,
+          bj: mappedData[i].bj,
+          point: mappedData[i].point,
         })
-        console.log(result > 0)
-        fs.writeFileSync(listFileUrl, JSON.stringify(orderedList))
+        // 리스트 파일로 저장
+        await fs.writeFile(
+          listFileUrl + pointListFileName,
+          JSON.stringify(pointList)
+        )
+      }
+
+      // 이전 기록과 비교해서 겹치는 게 없을 때(필터링 된 데이터 없음)
+      if (result.length == 0) {
+        console.log(
+          `[새로운 주문] 주문번호:${mappedData[i].productOrderId}|상품:${mappedData[i].productName}|수량:${mappedData[i].quantity}|구매자:${mappedData[i].nick}|BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
+        )
+
+        // 불러온 기존데이터 리스트에 추가
+        orderedList.push({
+          no: orderedList.length,
+          orderId: mappedData[i].productOrderId,
+        })
+
+        // 리스트 파일로 저장
+        await fs.writeFile(
+          listFileUrl + listFileName,
+          JSON.stringify(orderedList)
+        )
+
+        // 새로운 주문목록에 추가
         newOrders.push(mappedData[i])
       }
     }
+    // 순회 마치고 새롭게 추가된 데이터 반환
     return newOrders
   }
 
@@ -115,7 +139,6 @@ module.exports = class ApiControls {
    */
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
-    const check = this.compareExOrderList
 
     if (!oauthToken) {
       return false
@@ -130,24 +153,24 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          lastChangedFrom: new Date(new Date().getTime() - 5000),
+          /* TODO 10초 간격*/
+          lastChangedFrom: new Date(new Date().getTime() - 100000),
           lastChangedType: 'PAYED',
         },
       })
-        .then(function (response) {
+        .then(async function (response) {
           var chekcData = response.data.hasOwnProperty('data')
           if (chekcData) {
             const mappedData = response.data.data.lastChangeStatuses.map(
               (change) => change.productOrderId
             )
-            resolve(check(mappedData))
+            resolve(mappedData)
           } else {
             resolve(response.data)
           }
-          // const mappedData = response.data.data.lastChangeStatuses
         })
         .catch(function (error) {
-          console.error('getChangeList', error)
+          console.error('getChangeList', error.response.data)
           resolve(false)
         })
     })
@@ -157,7 +180,9 @@ module.exports = class ApiControls {
    * get Order List
    */
   async getOrderList() {
+    const API = await this.getAPIconfig()
     const orderList = await this.getChangeList()
+    const check = this.compareExOrderList
     if (orderList.length == 0) {
       return 'There are no new orders.'
     } else if (
@@ -180,25 +205,33 @@ module.exports = class ApiControls {
           productOrderIds: orderList,
         },
       })
-        .then(function (response) {
-          const mappedData = response.data.data.map((productOrder) => {
-            const options = productOrder.productOrder.productOption.split('/')
-            return {
-              nick: options[0].split(
-                JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
-                  .NICK_OPT + ': '
-              )[1],
-              text: options[1].split(
-                JSON.parse(fs.readFileSync(userDataPath + '/APIconfig.json'))
-                  .TEXT_OPT + ': '
-              )[1],
-              streamerName: productOrder.productOrder.productName
-                .match(/\[(.*?)\]/g)
-                .map((match) => match.slice(1, -1))[0],
-              productName: productOrder.productOrder.productName,
-            }
-          })
-          resolve(mappedData)
+        .then((response) => {
+          const placedOrder = response.data.data
+            // 발주한 상품 상세 데이터에는 'placeOrderDate'라는 KEY 가 존재함
+            .filter((order) =>
+              order.productOrder.hasOwnProperty('placeOrderDate')
+            )
+            /**
+            조회한 데이터 파싱
+            productOrder.productOrder.productOption
+            옵션으로 적은 값 포함되어있음 구분자는 '/'
+            */
+            .map((productOrder) => {
+              const options = productOrder.productOrder.productOption.split('/')
+              return {
+                productOrderId: productOrder.productOrder.productOrderId,
+                quantity: productOrder.productOrder.quantity,
+                nick: options[0].split(API.NICK_OPT + ': ')[1],
+                text: options[1].split(API.TEXT_OPT + ': ')[1],
+                size: options[2].split(API.SIZE_OPT + ': ')[1],
+                bj: options[3].split(API.BJ_OPT + ': ')[1],
+                point: options[4].split(API.POINT_OPT + ': ')[1],
+                productName:
+                  productOrder.productOrder.productName.split(']')[1],
+              }
+            })
+
+          resolve(check(placedOrder))
         })
         .catch(function (error) {
           console.error('getChangeList', error.response.data)
@@ -207,14 +240,7 @@ module.exports = class ApiControls {
     })
   }
 
-  /**
-   * NO Use
-   */
-  async getSellerChannelInfo() {
-    const productsList = await this.getProductList()
-    var arr = new Array()
-    for (var i in productsList) {
-      arr.push(productsList[i].channelProducts)
-    }
+  async getAPIconfig() {
+    return JSON.parse(await fs.readFile(userDataPath + '/APIconfig.json'))
   }
 }
