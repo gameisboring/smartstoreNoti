@@ -2,6 +2,7 @@ const express = require('express')
 const electron = require('electron')
 const fs = require('fs')
 const log = require('electron-log')
+const { quickStart } = require('./tts')
 
 const elApp = electron.app
 const PORT = 3000
@@ -21,9 +22,10 @@ const ApiControls = require('./api')
 const api = new ApiControls()
 
 app2.use(express.static('public'))
-app2.use(express.static(process.resourcesPath + '/app.asar/public'))
+// app2.use(express.static(process.resourcesPath + '/app.asar/public'))
 log.info('dirname', __dirname)
 log.info('process', process.resourcesPath)
+
 app2.get('/', function (req, res) {
   res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' })
   res.end('{"testcode":"200", "text":"Electorn Test~"}')
@@ -38,8 +40,17 @@ app2.get('/board', async function (req, res) {
 })
 
 app2.get('/test', async function (req, res) {
-  const dataList = await api.getProductList()
-  res.send(dataList)
+  res.sendFile(__dirname + '/views/test.html')
+})
+
+app2.get('/tts/:text', async function (req, res) {
+  await quickStart(req.params.text)
+    .then(() => {
+      res.sendFile(process.resourcesPath + '/output.mp3')
+    })
+    .catch((reason) => {
+      console.error('quickStart', reason)
+    })
 })
 
 app2.get('/change', async function (req, res) {
@@ -90,12 +101,24 @@ app2.get('/noti/image', function (req, res) {
   }
 })
 
+app2.get('/noti/stop', function (req, res) {
+  console.log('stop')
+  io.emit('stop', 'notification stop !!!')
+  res.send(true)
+})
+
+app2.get('/noti/resume', function (req, res) {
+  console.log('resume')
+  io.emit('resume', 'notification resume !!!')
+  res.send(true)
+})
+
 io.on('connection', function (socket) {
   log.info(socket.id, 'Connected')
   socket.emit('connection', `${socket.id} 연결 되었습니다.`)
 
   socket.on('orderList', async (msg) => {
-    log.info(msg)
+    log.info('orderList', msg)
     socket.emit('orderList', await api.getOrderList())
   })
 

@@ -6,6 +6,8 @@
     <style>
       body {
         margin: 0;
+        background-color: rgb(0, 0, 0);
+        color: #00ff00;
       }
 
       input:focus {
@@ -17,9 +19,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background-color: rgb(0, 0, 0);
-        color: #00ff00;
-        height: 100vh;
+
+        height: 90vh;
       }
 
       #configInputForm .inputGroup {
@@ -29,28 +30,52 @@
 
       #configInputForm .inputGroup span {
         flex-grow: 1;
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 500;
       }
 
       #configInputForm .inputGroup input[type='text'] {
         width: 500px;
-        font-size: 24px;
+        font-size: 20px;
         background-color: transparent;
         border: 0;
         color: #00ff00;
         border-bottom: 2px solid #00ff00;
       }
 
-      #configInputForm input[type='submit'] {
-        position: absolute;
-        width: 300px;
-        font-size: 24px;
+      .saveBtn {
+        width: 220px;
+        font-size: 25px;
         margin: 30px auto 0 auto;
+        position: absolute;
+        border: 0;
         bottom: 30px;
+        transition: all 0.2s ease-in;
+        background-color: transparent;
+        color: #00ff00;
+      }
+
+      .saveBtn:hover {
+        background-color: #00ff00;
+        color: black;
+        cursor: pointer;
+      }
+
+      input[type='submit'].saveBtn {
+        left: 30px;
+      }
+
+      #notiStop,
+      #notiResume {
+        right: 30px;
+      }
+
+      #notiResume {
+        display: none;
       }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
   </head>
   <body>
     <form action="" method="post" id="configInputForm">
@@ -87,15 +112,21 @@
         <span>점수 옵션이름</span>
         <input type="text" name="POINT_OPT" id="POINT_OPT" />
       </div>
-      <input type="submit" value="SAVE" />
+      <input type="submit" value="SAVE" class="saveBtn" />
     </form>
+    <div id="notiControl">
+      <button id="notiStop" class="saveBtn">알림 STOP</button>
+      <button id="notiResume" class="saveBtn">알림 RESUME</button>
+    </div>
   </body>
+
   <script>
+    var socket = io.connect('http://localhost:3000')
     const form = document.querySelector('#configInputForm')
     form.addEventListener('submit', async (event) => {
       event.preventDefault()
 
-      let response = await fetch('/config', {
+      let response = await fetch('http://localhost:3000/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +148,7 @@
       alert(result.message)
     })
 
-    fetch('/config')
+    fetch('http://localhost:3000/config')
       .then((response) => response.json())
       .then((data) => {
         document.querySelector('#CLIENT_ID').value = data.CLIENT_ID
@@ -129,5 +160,22 @@
         document.querySelector('#BJ_OPT').value = data.BJ_OPT
         document.querySelector('#POINT_OPT').value = data.POINT_OPT
       })
+
+    var notiStop = document.querySelector('#notiStop')
+    var notiResume = document.querySelector('#notiResume')
+
+    notiStop.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiStop.style.display = 'none'
+      notiResume.style.display = 'block'
+      await fetch('http://localhost:3000/noti/stop')
+    })
+
+    notiResume.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiResume.style.display = 'none'
+      notiStop.style.display = 'block'
+      await fetch('http://localhost:3000/noti/resume')
+    })
   </script>
 </html>

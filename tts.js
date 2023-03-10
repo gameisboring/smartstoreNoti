@@ -1,39 +1,31 @@
-// Load the SDK and UUID
-var AWS = require('aws-sdk')
-var fs = require('fs')
+// Imports the Google Cloud client library
+const textToSpeech = require('@google-cloud/text-to-speech')
+const elApp = require('electron').app
 
-var key = require('./key.json')
-
-AWS.config.update({
-  accessKeyId: key.access_key,
-  secretAccessKey: key.secret_access_key,
-  region: 'ap-northeast-2',
-})
-
-const Polly = new AWS.Polly({
-  signatureVersion: 'v2',
-  region: 'ap-northeast-2',
-})
-
-module.exports = { Polly }
-
-/* let params = {
-  Text: '반가워 112친구야~',
-  OutputFormat: 'mp3',
-  VoiceId: 'Seoyeon',
-}
-
-Polly.synthesizeSpeech(params, (err, data) => {
-  if (err) {
-    console.log(err.code)
-  } else if (data) {
-    if (data.AudioStream instanceof Buffer) {
-      fs.writeFile('./speech.mp3', data.AudioStream, function (err) {
-        if (err) {
-          return console.log(err)
-        }
-        console.log('The file was saved!')
-      })
-    }
+// Import other required libraries
+const fs = require('fs')
+const util = require('util')
+// Creates a client
+const client = new textToSpeech.TextToSpeechClient()
+async function quickStart(text) {
+  // Construct the request
+  const request = {
+    input: { text: text },
+    // Select the language and SSML voice gender (optional)
+    voice: { languageCode: 'ko-KR', ssmlGender: 'PLAIN' },
+    // select the type of audio encoding
+    audioConfig: { audioEncoding: 'MP3' },
   }
-}) */
+
+  // Performs the text-to-speech request
+  const [response] = await client.synthesizeSpeech(request)
+  // Write the binary audio content to a local file
+  const writeFile = util.promisify(fs.writeFile)
+  await writeFile(
+    process.resourcesPath + '/output.mp3',
+    response.audioContent,
+    'binary'
+  )
+  console.log('Audio content written to file: output.mp3')
+}
+module.exports = { quickStart }

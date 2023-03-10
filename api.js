@@ -5,7 +5,6 @@ const fs = require('fs').promises
 const axios = require('axios').default
 const { dateFormat, fourHoursAgo } = require('./time')
 const { io } = require('./server')
-// const { Polly } = require('./tts')
 
 // const API = require(userDataPath + '/APIconfig.json')
 const { createhashedSign } = require('./hash')
@@ -75,12 +74,12 @@ module.exports = class ApiControls {
     for (var i in mappedData) {
       var result = orderedList.filter(
         // productOrderId 중복이면 필터링
-        (order) => order.orderId == mappedData[i].productOrderId
+        (order) => order.productOrderId == mappedData[i].productOrderId
       )
 
       var pointResult = pointList.filter(
         // productOrderId 중복이면 필터링
-        (order) => order.orderId == mappedData[i].productOrderId
+        (order) => order.productOrderId == mappedData[i].productOrderId
       )
 
       if (pointResult.length == 0) {
@@ -88,7 +87,7 @@ module.exports = class ApiControls {
         pointList.push({
           no: pointList.length,
           nick: mappedData[i].nick,
-          orderId: mappedData[i].productOrderId,
+          productOrderId: mappedData[i].productOrderId,
           bj: mappedData[i].bj,
           point: mappedData[i].point,
           orderDate: mappedData[i].date,
@@ -107,17 +106,13 @@ module.exports = class ApiControls {
           `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${mappedData[i].productName} | 수량: ${mappedData[i].quantity}ea | 구매자: ${mappedData[i].nick} | BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
         )
 
-        io.on('connection', async function (socket) {
-          console.log(socket.id, 'Connected')
-          socket.emit('connection', `${socket.id} 연결 되었습니다.`)
-          socket.emit('orderList', await this.getOrderList())
-          socket.emit('scoreboard', await this.scoreBoardToUsableData())
-        })
+        io.emit('orderList', mappedData[i])
+        io.emit('scoreboard', await this.scoreBoardToUsableData())
 
         // 불러온 기존데이터 리스트에 추가
         orderedList.push({
           no: orderedList.length,
-          orderId: mappedData[i].productOrderId,
+          productOrderId: mappedData[i].productOrderId,
         })
 
         // 리스트 파일로 저장
@@ -140,24 +135,7 @@ module.exports = class ApiControls {
    */
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
-    Polly.synthesizeSpeech(params, async (err, data) => {
-      if (err) {
-        console.log(err.code)
-      } else if (data) {
-        if (data.AudioStream instanceof Buffer) {
-          await fs.writeFile(
-            userDataPath + './speech.mp3',
-            data.AudioStream,
-            function (err) {
-              if (err) {
-                return console.log(err)
-              }
-              console.log('The file was saved!')
-            }
-          )
-        }
-      }
-    })
+
     if (!oauthToken) {
       return false
     }

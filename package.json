@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "deploy": "electron-builder --win nsis:x64"
+    "deploy": "electron-builder --win nsis:x64",
+    "tts": "nodemon tts.js"
   },
   "build": {
     "productName": "test",
@@ -39,6 +40,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/text-to-speech": "^4.2.1",
+    "aws-sdk": "^2.1332.0",
     "axios": "^1.3.3",
     "bcrypt": "^5.1.0",
     "cookie-parser": "~1.4.4",

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body></body>
+  <script>
+    var socket = io()
+    socket.on('stop', (msg) => {
+      console.log(msg)
+    })
+
+    socket.on('resume', (msg) => {
+      console.log(msg)
+    })
+
+    socket.on('orderList', (msg) => {
+      console.log(msg)
+    })
+  </script>
+</html>

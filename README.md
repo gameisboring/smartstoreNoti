@@ -6,15 +6,16 @@
 
 # 사용법
 
-    1. npm install
-    2. npm run deploy
-    3. dist 폴더에 생성된 exe 파일로 설치진행
+1. 설치파일 실행
+2. 환경변수 설정
 
-<br>
-
-# 레이아웃
-
-웹소켓 통신으로 레이아웃 <-> 서버 간 통신을 주고받습니다
+   1. 작업표시줄 검색 "시스템 환경변수 편집"
+   2. 환경변수 버튼 클릭 -> 시스템변수 영역 -> 새로만들기 클릭
+   3. 내용입력<br>
+      변수 이름 : GOOGLE_APPLICATION_CREDENTIALS<br>
+      변수 값 : C:\Users\user\AppData\Roaming\smartstorenoti\tts-api-account.json
+   4. 동봉된 "tts-api-account.json" 파일을<br>
+      "C:\Users\user\AppData\Roaming\smartstorenoti" 경로에 저장
 
 <br>
 
@@ -47,6 +48,10 @@ Windows에서의 경로는 C:\Users\\[사용자명]\AppData\Roaming\smartstoreno
 
 - 이 프로그램은 개별 주문 건에 대한 옵션값을 저장하여<br>
   종합 환산하는 방식으로 점수를 계산합니다
+
+### - 순위표 조작
+
+- 원하는 주문내역을 Object 형태로 추가하시면 해당 주문건에 대한 내용이 순위표에 반영됩니다.
 
 <br>
 

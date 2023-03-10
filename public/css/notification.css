@@ -30,3 +30,13 @@
   font-size: 45px;
   color: red;
 }
+
+#start {
+  width: 50vw;
+  height: 50vh;
+  background-color: #00000063;
+}
+
+/* #myAudio {
+  display: none;
+} */
