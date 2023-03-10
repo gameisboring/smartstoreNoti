@@ -1,6 +1,7 @@
 const electron = require('electron')
 const ipcMain = electron.ipcMain
 const fs = require('fs')
+const { dateFormat, fourHoursAgo } = require('./time')
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const elApp = electron.app
 const apiSchema = {
@@ -9,16 +10,6 @@ const apiSchema = {
   ACCOUNT_ID: '',
   NICK_OPT: '아프리카닉네임',
   TEXT_OPT: '메세지',
-}
-
-function dateFormat(date) {
-  let month = date.getMonth() + 1
-  let day = date.getDate()
-
-  month = month >= 10 ? month : '0' + month
-  day = day >= 10 ? day : '0' + day
-
-  return date.getFullYear() + '-' + month + '-' + day
 }
 
 if (!fs.readFileSync(elApp.getPath('userData') + '/APIconfig.json')) {
@@ -37,14 +28,16 @@ try {
 
 try {
   !fs.readFileSync(
-    elApp.getPath('userData') + '/list' + `/${dateFormat(new Date())}_list.json`
+    elApp.getPath('userData') +
+      '/list' +
+      `/${dateFormat(fourHoursAgo())}_list.json`
   )
 } catch {
-  console.log(`file writing .... ${dateFormat(new Date())}_list.json`)
+  console.log(`file writing .... ${dateFormat(fourHoursAgo())}_list.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(new Date())}_list.json`,
+      `/${dateFormat(fourHoursAgo())}_list.json`,
     '[]'
   )
 }
@@ -53,19 +46,20 @@ try {
   !fs.readFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(new Date())}_pointList.json`
+      `/${dateFormat(fourHoursAgo())}_pointList.json`
   )
 } catch {
+  console.log(`file writing .... ${dateFormat(fourHoursAgo())}_pointList.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(new Date())}_pointList.json`,
+      `/${dateFormat(fourHoursAgo())}_pointList.json`,
     '[]'
   )
 }
 
 // express 서버
-const { app2 } = require('./server')
+require('./server')
 
 // 네이티브 브라우저 창을 만드는 모듈.
 const { BrowserWindow } = electron

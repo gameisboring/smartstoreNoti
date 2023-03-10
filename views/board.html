@@ -7,16 +7,174 @@
     <title>판매 점수 집계 안내판</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <link rel="stylesheet" href="css/board.css" />
+    <style>
+      body {
+        margin-left: 100px;
+        margin-top: 75px;
+      }
+
+      img {
+        display: block;
+      }
+
+      #main {
+        width: 400px;
+      }
+
+      .bar {
+        background-image: url(images/barBack.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        font-weight: 700;
+        height: 30px;
+        padding-left: 13px;
+        padding-right: 25px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .bar img {
+        margin: 5px auto;
+        height: 25px;
+        width: 100%;
+      }
+
+      .bar .barText {
+        padding-left: 18px;
+        position: relative;
+        bottom: 31px;
+        line-height: 30px;
+      }
+
+      .bar .barText.menu {
+        display: flex;
+        bottom: 32px;
+        padding: 0;
+        text-align: center;
+      }
+
+      .white {
+        color: white;
+      }
+
+      .bar .barText.menu span {
+        flex-basis: 0;
+      }
+
+      .bar .barText .rank {
+        flex-grow: 0.5;
+      }
+
+      .bar .barText .bj {
+        flex-grow: 1.4;
+      }
+
+      .bar .barText .score {
+        flex-grow: 1;
+      }
+
+      .bar .barText .contribute {
+        flex-grow: 1;
+      }
+
+      .footer .barText.footer {
+        position: relative;
+        display: flex;
+        bottom: 85px;
+        padding-left: 13px;
+        padding-right: 25px;
+        height: 85px;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer .barText.footer span {
+        font-size: 25px;
+        font-weight: 700;
+      }
+
+      .footer .barText.footer .total {
+        border: 3px solid black;
+        height: 35px;
+        line-height: 35px;
+        display: flex;
+        justify-content: space-around;
+        padding: 0 20px;
+        min-width: 100px;
+      }
+    </style>
   </head>
   <body>
-    <table id="main">
-      <thead>
-        <td>
-          <img src="" alt="" srcset="" />
-        </td>
-      </thead>
-    </table>
+    <div id="main">
+      <div id="header">
+        <img src="images/header.png" alt="" width="100%" />
+      </div>
+
+      <div class="bar">
+        <img src="images/listbar_black.png" alt="" />
+        <div class="barText menu white">
+          <span class="rank">순위</span>
+          <span class="bj">BJ</span>
+          <span class="score">판매점수</span>
+          <span class="contribute">기여도</span>
+        </div>
+      </div>
+      <div class="body">
+        <!--   <div class="bar">
+          <img src="images/listbar_1.png" alt="" />
+          <div class="barText menu">
+            <span class="rank">1</span>
+            <span class="bj">영민</span>
+            <span class="score">100</span>
+            <span class="contribute">300</span>
+          </div>
+        </div>
+        <div class="bar">
+          <img src="images/listbar_2.png" alt="" />
+          <div class="barText menu">
+            <span class="rank">1</span>
+            <span class="bj">영민</span>
+            <span class="score">100</span>
+            <span class="contribute">300</span>
+          </div>
+        </div>
+        <div class="bar">
+          <img src="images/listbar_3.png" alt="" />
+          <div class="barText menu">
+            <span class="rank">1</span>
+            <span class="bj">영민</span>
+            <span class="score">100</span>
+            <span class="contribute">300</span>
+          </div>
+        </div>
+        <div class="bar">
+          <img src="images/listbar.png" alt="" />
+          <div class="barText menu">
+            <span class="rank">1</span>
+            <span class="bj">영민</span>
+            <span class="score">100</span>
+            <span class="contribute">300</span>
+          </div>
+        </div>
+        <div class="bar">
+          <img src="images/listbar_low.png" alt="" />
+          <div class="barText menu">
+            <span class="rank">1</span>
+            <span class="bj">영민</span>
+            <span class="score">100</span>
+            <span class="contribute">300</span>
+          </div>
+        </div>
+      </div> -->
+      </div>
+      <div class="footer">
+        <img src="images/footer.png" alt="" width="100%" />
+        <div class="barText footer">
+          <span>판매실적 총합</span>
+          <div class="total"><span id="totalCount">0</span><span>개</span></div>
+        </div>
+      </div>
+    </div>
   </body>
   <script src="javascripts/board.js"></script>
 </html>

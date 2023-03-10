@@ -1,11 +1,24 @@
 var socket = io()
 var list = []
+var notiInfoReqInterval
 
-socket.emit('orderList', 'test')
+// let notiInfoReqInterval = setInterval(callback, 1000)
 
-setInterval(async () => {
-  socket.emit('orderList', 'noti')
-}, 7000)
+async function callback() {
+  console.log('Socket Emit')
+  socket.emit('orderList', new Date().getTime())
+}
+
+socket.on('disconnect', (reason) => {
+  console.log(reason)
+  clearInterval(notiInfoReqInterval)
+})
+
+socket.on('connection', (reason) => {
+  console.log(reason)
+  notiInfoReqInterval = setInterval(callback, 10000)
+})
+
 setInterval(() => {
   if (list.length > 0) {
     displayNotification()
@@ -13,7 +26,7 @@ setInterval(() => {
 }, 3000)
 
 var displayNotification = () => {
-  console.log('현재 : ' + list.length + '개 남음')
+  console.log('남은 알림 현재 : ' + list.length + '개 남음')
   var el = list.shift()
   Swal.fire({
     title: `<span class="nick">${el.nick}</span>님
@@ -29,9 +42,6 @@ var displayNotification = () => {
     showConfirmButton: false,
     background: 'transparent',
     backdrop: `rgba(0,0,0,0.0)`,
-    didOpen: () => {
-      const span = Swal.getHtmlContainer().querySelector('span')
-    },
   }).then((result) => {
     if (result.dismiss === Swal.DismissReason.timer) {
       console.log('I was closed by the timer')

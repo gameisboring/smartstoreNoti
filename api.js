@@ -3,27 +3,18 @@ const elApp = electron.app
 const userDataPath = elApp.getPath('userData')
 const fs = require('fs').promises
 const axios = require('axios').default
+const { dateFormat, fourHoursAgo } = require('./time')
+const { io } = require('./server')
+// const { Polly } = require('./tts')
 
 // const API = require(userDataPath + '/APIconfig.json')
 const { createhashedSign } = require('./hash')
 // 2023-01-01_list.json
-let listFileName = `/${dateFormat(new Date())}_list.json`
+let listFileName = `/${dateFormat(fourHoursAgo())}_list.json`
 // 2023-01-01_pointList.json
-let pointListFileName = `/${dateFormat(new Date())}_pointList.json`
+let pointListFileName = `/${dateFormat(fourHoursAgo())}_pointList.json`
 //  appdata/roaming/projectName
 let listFileUrl = elApp.getPath('userData') + '/list'
-
-function dateFormat(date) {
-  let month = date.getMonth() + 1
-  let day = date.getDate()
-
-  month = month >= 10 ? month : '0' + month
-  day = day >= 10 ? day : '0' + day
-
-  return date.getFullYear() + '-' + month + '-' + day
-}
-
-console.log(dateFormat(new Date()))
 
 module.exports = class ApiControls {
   /**
@@ -96,9 +87,12 @@ module.exports = class ApiControls {
         // 불러온 포인트 리스트에 데이터 추가
         pointList.push({
           no: pointList.length,
+          nick: mappedData[i].nick,
           orderId: mappedData[i].productOrderId,
           bj: mappedData[i].bj,
           point: mappedData[i].point,
+          orderDate: mappedData[i].date,
+          quantity: mappedData[i].quantity,
         })
         // 리스트 파일로 저장
         await fs.writeFile(
@@ -110,8 +104,15 @@ module.exports = class ApiControls {
       // 이전 기록과 비교해서 겹치는 게 없을 때(필터링 된 데이터 없음)
       if (result.length == 0) {
         console.log(
-          `[새로운 주문] 주문번호:${mappedData[i].productOrderId}|상품:${mappedData[i].productName}|수량:${mappedData[i].quantity}|구매자:${mappedData[i].nick}|BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
+          `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${mappedData[i].productName} | 수량: ${mappedData[i].quantity}ea | 구매자: ${mappedData[i].nick} | BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
         )
+
+        io.on('connection', async function (socket) {
+          console.log(socket.id, 'Connected')
+          socket.emit('connection', `${socket.id} 연결 되었습니다.`)
+          socket.emit('orderList', await this.getOrderList())
+          socket.emit('scoreboard', await this.scoreBoardToUsableData())
+        })
 
         // 불러온 기존데이터 리스트에 추가
         orderedList.push({
@@ -139,7 +140,24 @@ module.exports = class ApiControls {
    */
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
-
+    Polly.synthesizeSpeech(params, async (err, data) => {
+      if (err) {
+        console.log(err.code)
+      } else if (data) {
+        if (data.AudioStream instanceof Buffer) {
+          await fs.writeFile(
+            userDataPath + './speech.mp3',
+            data.AudioStream,
+            function (err) {
+              if (err) {
+                return console.log(err)
+              }
+              console.log('The file was saved!')
+            }
+          )
+        }
+      }
+    })
     if (!oauthToken) {
       return false
     }
@@ -228,6 +246,7 @@ module.exports = class ApiControls {
                 point: options[4].split(API.POINT_OPT + ': ')[1],
                 productName:
                   productOrder.productOrder.productName.split(']')[1],
+                date: productOrder.order.paymentDate,
               }
             })
 
@@ -238,6 +257,51 @@ module.exports = class ApiControls {
           resolve(error)
         })
     })
+  }
+
+  async getScroeList() {
+    let scoreResult = new Object({})
+    scoreResult.total = 0
+    let pointList = JSON.parse(
+      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
+    )
+    for (var i in pointList) {
+      if (!scoreResult.hasOwnProperty(pointList[i].bj)) {
+        scoreResult[pointList[i].bj] = { plus: 0, minus: 0, quantity: 0 }
+      }
+
+      if (pointList[i].point == '플러스') {
+        scoreResult[pointList[i].bj].plus++
+      } else if (pointList[i].point == '마이너스') {
+        scoreResult[pointList[i].bj].minus++
+      }
+
+      scoreResult[pointList[i].bj].quantity += pointList[i].quantity
+      scoreResult.total++
+    }
+    return scoreResult
+  }
+
+  async scoreBoardToUsableData() {
+    let scoreboard = await this.getScroeList()
+    // 주문건수만 먹고 버리기
+    let total = Number(scoreboard.total)
+    delete scoreboard.total
+
+    let result = new Array()
+
+    for (var i in Object.keys(scoreboard)) {
+      var newObj = {
+        name: Object.keys(scoreboard)[i],
+        score:
+          scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
+          scoreboard[Object.keys(scoreboard)[i]].minus * 100,
+        contribute: scoreboard[Object.keys(scoreboard)[i]].quantity * 100,
+      }
+      result.push(newObj)
+    }
+    result.sort((a, b) => b.score - a.score)
+    return { result, total }
   }
 
   async getAPIconfig() {

@@ -44,10 +44,12 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "^3.1.8",
+    "electron-log": "^5.0.0-beta.16",
     "express": "^4.18.2",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "socket.io": "^4.6.0"
+    "socket.io": "^4.6.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "electron": "v22.1.0",

@@ -95,7 +95,7 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault()
 
-      let response = await fetch('http://localhost:3000/config', {
+      let response = await fetch('/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@
       alert(result.message)
     })
 
-    fetch('http://localhost:3000/config')
+    fetch('/config')
       .then((response) => response.json())
       .then((data) => {
         document.querySelector('#CLIENT_ID').value = data.CLIENT_ID

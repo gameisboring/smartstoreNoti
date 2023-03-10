@@ -1,34 +1,40 @@
 const express = require('express')
 const electron = require('electron')
 const fs = require('fs')
+const log = require('electron-log')
 
 const elApp = electron.app
 const PORT = 3000
 const app2 = express()
 const server = app2.listen(PORT, function () {
-  console.log(`Server Running on ${PORT} Port`)
+  log.info(`Server Running on ${PORT} Port`)
 })
-const example = require('./example')
 
 app2.use(express.json())
 app2.use(express.urlencoded({ extended: false }))
 
 const SocketIO = require('socket.io')
 const io = SocketIO(server, { path: '/socket.io' })
+module.exports = { io }
 
 const ApiControls = require('./api')
 const api = new ApiControls()
 
 app2.use(express.static('public'))
-
+app2.use(express.static(process.resourcesPath + '/app.asar/public'))
+log.info('dirname', __dirname)
+log.info('process', process.resourcesPath)
 app2.get('/', function (req, res) {
   res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' })
   res.end('{"testcode":"200", "text":"Electorn Test~"}')
 })
 
 app2.get('/notification', async function (req, res) {
-  io.emit('orderList', await api.getOrderList())
   res.sendFile(__dirname + '/views/notification.html')
+})
+
+app2.get('/board', async function (req, res) {
+  res.sendFile(__dirname + '/views/board.html')
 })
 
 app2.get('/test', async function (req, res) {
@@ -43,8 +49,16 @@ app2.get('/change', async function (req, res) {
 
 app2.get('/order', async function (req, res) {
   const dataList = await api.getOrderList()
-
   res.send(dataList)
+})
+
+app2.get('/scoreboard', async function (req, res) {
+  const dataList = await api.scoreBoardToUsableData()
+  res.json(dataList)
+})
+app2.get('/scoreboard/get', async function (req, res) {
+  const dataList = await api.getScroeList()
+  res.json(dataList)
 })
 
 /* 설정 가져오기 */
@@ -76,17 +90,17 @@ app2.get('/noti/image', function (req, res) {
   }
 })
 
-app2.get('/ex/1', function (req, res) {
-  res.send(example.notiData)
-})
-
 io.on('connection', function (socket) {
-  console.log(socket.id, 'Connected')
-
-  socket.emit('msg', `${socket.id} 연결 되었습니다.`)
+  log.info(socket.id, 'Connected')
+  socket.emit('connection', `${socket.id} 연결 되었습니다.`)
 
   socket.on('orderList', async (msg) => {
+    log.info(msg)
     socket.emit('orderList', await api.getOrderList())
+  })
+
+  socket.on('scoreboard', async (msg) => {
+    socket.emit('scoreboard', await api.scoreBoardToUsableData())
   })
 })
 
