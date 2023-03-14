@@ -1,17 +1,18 @@
 const electron = require('electron')
-const elApp = electron.app
-const userDataPath = elApp.getPath('userData')
 const fs = require('fs').promises
 const axios = require('axios').default
-const { dateFormat, fourHoursAgo } = require('./time')
 const { io } = require('./server')
+const log = require('electron-log')
 
-// const API = require(userDataPath + '/APIconfig.json')
 const { createhashedSign } = require('./hash')
+const { dateFormat, hoursAgo } = require('./time')
+
+const elApp = electron.app
+const userDataPath = elApp.getPath('userData')
 // 2023-01-01_list.json
-let listFileName = `/${dateFormat(fourHoursAgo())}_list.json`
+let listFileName = `/${dateFormat(hoursAgo(6))}_list.json`
 // 2023-01-01_pointList.json
-let pointListFileName = `/${dateFormat(fourHoursAgo())}_pointList.json`
+let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
 //  appdata/roaming/projectName
 let listFileUrl = elApp.getPath('userData') + '/list'
 
@@ -41,16 +42,16 @@ module.exports = class ApiControls {
         },
       })
         .then(function (response) {
-          console.log(
-            'OAuth Token Expires in',
-            `${Math.floor(response.data.expires_in / 60)}분 ${
-              response.data.expires_in % 60
-            }초`
-          )
+          // log.info(
+          //   'OAuth Token Expires in',
+          //   `${Math.floor(response.data.expires_in / 60)}분 ${
+          //     response.data.expires_in % 60
+          //   }초`
+          // )
           resolve(response.data.access_token)
         })
         .catch(function (error) {
-          console.log('getOauthTokenToAxios', error.response.data)
+          log.error('getOauthTokenToAxios', error.response.data)
 
           resolve(false)
         })
@@ -70,6 +71,7 @@ module.exports = class ApiControls {
     let pointList = JSON.parse(
       await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
     )
+    let apiControls = new ApiControls()
     // 파라미터로 넘어온 데이터 순회하며 중복조회
     for (var i in mappedData) {
       var result = orderedList.filter(
@@ -102,12 +104,12 @@ module.exports = class ApiControls {
 
       // 이전 기록과 비교해서 겹치는 게 없을 때(필터링 된 데이터 없음)
       if (result.length == 0) {
-        console.log(
+        log.info(
           `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${mappedData[i].productName} | 수량: ${mappedData[i].quantity}ea | 구매자: ${mappedData[i].nick} | BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
         )
 
-        io.emit('orderList', mappedData[i])
-        io.emit('scoreboard', await this.scoreBoardToUsableData())
+        // io.emit('orderList', mappedData[i])
+        // io.emit('scoreboard', await apiControls.scoreBoardToUsableData())
 
         // 불러온 기존데이터 리스트에 추가
         orderedList.push({
@@ -149,8 +151,8 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          /* TODO 10초 간격*/
-          lastChangedFrom: new Date(new Date().getTime() - 100000),
+          // 10분 전
+          lastChangedFrom: new Date(new Date().getTime() - 600000),
           lastChangedType: 'PAYED',
         },
       })
@@ -166,7 +168,7 @@ module.exports = class ApiControls {
           }
         })
         .catch(function (error) {
-          console.error('getChangeList', error.response.data)
+          console.error('getChangeList', error.response)
           resolve(false)
         })
     })
@@ -255,7 +257,7 @@ module.exports = class ApiControls {
       }
 
       scoreResult[pointList[i].bj].quantity += pointList[i].quantity
-      scoreResult.total++
+      scoreResult.total += pointList[i].quantity
     }
     return scoreResult
   }

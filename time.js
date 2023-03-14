@@ -16,8 +16,8 @@ function timeFormat(date) {
   return `${hour}:${min}:${sec}`
 }
 
-function fourHoursAgo() {
-  return new Date(new Date().getTime() - 14400000)
+function hoursAgo(number) {
+  return new Date(new Date().getTime() - 1000 * 60 * 60 * number)
 }
 
-module.exports = { dateFormat, timeFormat, fourHoursAgo }
+module.exports = { dateFormat, timeFormat, hoursAgo }

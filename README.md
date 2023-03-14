@@ -7,15 +7,6 @@
 # 사용법
 
 1. 설치파일 실행
-2. 환경변수 설정
-
-   1. 작업표시줄 검색 "시스템 환경변수 편집"
-   2. 환경변수 버튼 클릭 -> 시스템변수 영역 -> 새로만들기 클릭
-   3. 내용입력<br>
-      변수 이름 : GOOGLE_APPLICATION_CREDENTIALS<br>
-      변수 값 : C:\Users\user\AppData\Roaming\smartstorenoti\tts-api-account.json
-   4. 동봉된 "tts-api-account.json" 파일을<br>
-      "C:\Users\user\AppData\Roaming\smartstorenoti" 경로에 저장
 
 <br>
 

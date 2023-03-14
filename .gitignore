@@ -1,9 +1,10 @@
 /node_modules
 /dist
 /config/**
-!/config/ApiConfig.json
+/ApiConfig.json
 /example.js
 /test
 /key.json
 /tts-api-account.json
 /gac.sh
+config/ApiConfig.json

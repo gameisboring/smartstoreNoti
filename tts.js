@@ -1,6 +1,5 @@
 // Imports the Google Cloud client library
 const textToSpeech = require('@google-cloud/text-to-speech')
-const elApp = require('electron').app
 
 // Import other required libraries
 const fs = require('fs')

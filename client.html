@@ -10,6 +10,11 @@
         color: #00ff00;
       }
 
+      h2 {
+        line-height: 35px;
+        margin: 0;
+      }
+
       input:focus {
         outline: none;
       }
@@ -59,6 +64,9 @@
         background-color: #00ff00;
         color: black;
         cursor: pointer;
+      }
+      .links {
+        margin-top: 20px;
       }
 
       input[type='submit'].saveBtn {
@@ -111,6 +119,20 @@
       <div class="inputGroup">
         <span>점수 옵션이름</span>
         <input type="text" name="POINT_OPT" id="POINT_OPT" />
+      </div>
+      <div class="links">
+        <h2>
+          구매알림
+          <a href="http://localhost:3000/notification" target="_blank"
+            >http://localhost:3000/notification</a
+          >
+        </h2>
+        <h2>
+          스코어보드
+          <a href="http://localhost:3000/board" target="_blank"
+            >http://localhost:3000/board</a
+          >
+        </h2>
       </div>
       <input type="submit" value="SAVE" class="saveBtn" />
     </form>

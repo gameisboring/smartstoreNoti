@@ -1,7 +1,10 @@
 const electron = require('electron')
 const ipcMain = electron.ipcMain
 const fs = require('fs')
-const { dateFormat, fourHoursAgo } = require('./time')
+const { dateFormat, hoursAgo } = require('./time')
+const log = require('electron-log')
+const basicAPIconfig = require('./APIconfig.json')
+
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const elApp = electron.app
 const apiSchema = {
@@ -10,13 +13,17 @@ const apiSchema = {
   ACCOUNT_ID: '',
   NICK_OPT: '아프리카닉네임',
   TEXT_OPT: '메세지',
+  SIZE_OPT: '사이즈',
+  BJ_OPT: 'BJ',
+  POINT_OPT: '플마',
 }
 
-if (!fs.readFileSync(elApp.getPath('userData') + '/APIconfig.json')) {
+if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
   fs.writeFileSync(
     elApp.getPath('userData') + '/APIconfig.json',
-    JSON.stringify(apiSchema)
+    JSON.stringify(basicAPIconfig)
   )
+  log.info(`file writing .... APIconfig.json`)
 }
 
 try {
@@ -30,14 +37,14 @@ try {
   !fs.readFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(fourHoursAgo())}_list.json`
+      `/${dateFormat(hoursAgo(6))}_list.json`
   )
 } catch {
-  console.log(`file writing .... ${dateFormat(fourHoursAgo())}_list.json`)
+  console.log(`file writing .... ${dateFormat(hoursAgo(6))}_list.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(fourHoursAgo())}_list.json`,
+      `/${dateFormat(hoursAgo(6))}_list.json`,
     '[]'
   )
 }
@@ -46,14 +53,14 @@ try {
   !fs.readFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(fourHoursAgo())}_pointList.json`
+      `/${dateFormat(hoursAgo(6))}_pointList.json`
   )
 } catch {
-  console.log(`file writing .... ${dateFormat(fourHoursAgo())}_pointList.json`)
+  console.log(`file writing .... ${dateFormat(hoursAgo(6))}_pointList.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
-      `/${dateFormat(fourHoursAgo())}_pointList.json`,
+      `/${dateFormat(hoursAgo(6))}_pointList.json`,
     '[]'
   )
 }
@@ -67,6 +74,9 @@ const { BrowserWindow } = electron
 console.log(elApp.getPath('home'))
 console.log(elApp.getPath('appData'))
 console.log(elApp.getPath('userData'))
+
+// 하드웨어 가속 끄기
+elApp.disableHardwareAcceleration()
 
 // 윈도우 객체를 전역에 유지합니다. 만약 이렇게 하지 않으면
 // 자바스크립트 GC가 일어날 때 창이 멋대로 닫혀버립니다.

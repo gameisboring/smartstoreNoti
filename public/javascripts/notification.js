@@ -2,21 +2,20 @@ var socket = io('http://localhost:3000')
 var list = []
 var notiInfoReqInterval
 var notiPopUpInterval
-var notiSound = new Audio(`sounds/fist.mp3`)
+var notiSound = new Audio(`sounds/first.mp3`)
 
 document.querySelector('#start').addEventListener('click', (event) => {
   event.preventDefault()
   document.querySelector('#start').style.display = 'none'
 })
 
-// let notiInfoReqInterval = setInterval(callback, 1000)
-
-/* async function notiReqCallback() {
-  console.log('Socket Emit')
+async function notiReqCallback() {
+  console.log('noti information request function')
   socket.emit('orderList')
-} */
+}
 
 async function notiPopUpCallback() {
+  console.log('noti PopUp function')
   if (list.length > 0) {
     displayNotification()
   }
@@ -25,27 +24,29 @@ async function notiPopUpCallback() {
 socket.on('disconnect', (reason) => {
   console.log(reason)
   clearInterval(notiInfoReqInterval)
-  // clearInterval(notiPopUpInterval)
+  clearInterval(notiPopUpInterval)
 })
 
 socket.on('connection', (reason) => {
   console.log(reason)
   notiReqCallback()
-  // notiInfoReqInterval = setInterval(notiReqCallback, 10000)
+
+  notiInfoReqInterval = setInterval(notiReqCallback, 10000)
   notiPopUpInterval = setInterval(notiPopUpCallback, 5000)
 })
 
 socket.on('stop', (msg) => {
   console.log(msg)
   Swal.stopTimer()
-  // clearInterval(notiInfoReqInterval)
+
+  clearInterval(notiInfoReqInterval)
   clearInterval(notiPopUpInterval)
 })
 
 socket.on('resume', (msg) => {
   console.log(msg)
   Swal.resumeTimer()
-  // notiInfoReqInterval = setInterval(notiReqCallback, 10000)
+  notiInfoReqInterval = setInterval(notiReqCallback, 10000)
   notiPopUpInterval = setInterval(notiPopUpCallback, 5000)
 })
 
@@ -53,12 +54,15 @@ socket.on('orderList', (msg) => {
   if (typeof msg == 'string') {
     console.log(msg)
   } else if (typeof msg == 'object') {
+    console.log(msg)
     console.log('new Orders ' + msg.length)
-
-    msg.forEach((element) => {
-      list.push(element)
-    })
+    if (msg.length >= 0) {
+      msg.forEach((element) => {
+        list.push(element)
+      })
+    }
   } else {
+    // TODO
     return
   }
 })
@@ -92,7 +96,7 @@ var displayNotification = () => {
       }
       notiSound.play()
       setTimeout(() => {
-        new Audio('http://localhost:3000/tts/' + notiText).play()
+        new Audio('http://nstream.kr:1322/' + notiText).play()
       }, 2000)
     },
   }).then((result) => {
