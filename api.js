@@ -23,6 +23,17 @@ module.exports = class ApiControls {
    */
   async getOauthTokenToAxios() {
     const API = await this.getAPIconfig()
+    /* log.info('req params', {
+      client_id: API.CLIENT_ID,
+      timestamp: new Date().getTime() - 3000,
+      client_secret_sign: await createhashedSign(
+        `${API.CLIENT_ID}_${new Date().getTime() - 3000}`,
+        API.CLIENT_SECRET
+      ),
+      grant_type: 'client_credentials',
+      type: 'SELF',
+      account_id: API.ACCOUNT_ID,
+    }) */
     return new Promise(async (resolve, reject) => {
       await axios({
         method: 'post',
@@ -52,7 +63,7 @@ module.exports = class ApiControls {
         })
         .catch(function (error) {
           log.error('getOauthTokenToAxios', error.response.data)
-
+          log.error('server time', new Date().getTime() - 3000)
           resolve(false)
         })
     })
@@ -178,6 +189,35 @@ module.exports = class ApiControls {
    * get Order List
    */
   async getOrderList() {
+    /* return [
+      {
+        nick: '테스트트트 ',
+        text: '메세지',
+        size: '240 ',
+        bj: '시원 ',
+        quantity: '1',
+        point: '플러스',
+        productName: ' 뭉탱이 케인 슬리퍼 조합형',
+      },
+      {
+        nick: '테스트트트 ',
+        text: '메가커피',
+        size: '240 ',
+        bj: '시원 ',
+        quantity: '5',
+        point: '플러스',
+        productName: ' 뭉탱이 케인 슬리퍼 조합형',
+      },
+      {
+        nick: '테스트트트 ',
+        text: '빽다방',
+        size: '240 ',
+        bj: '시원 ',
+        quantity: '5',
+        point: '플러스',
+        productName: ' 뭉탱이 케인 슬리퍼 조합형',
+      },
+    ] */
     const API = await this.getAPIconfig()
     const orderList = await this.getChangeList()
     const check = this.compareExOrderList

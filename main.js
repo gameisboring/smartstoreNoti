@@ -1,9 +1,12 @@
 const electron = require('electron')
-const ipcMain = electron.ipcMain
+const { ipcMain } = electron
 const fs = require('fs')
 const { dateFormat, hoursAgo } = require('./time')
 const log = require('electron-log')
 const basicAPIconfig = require('./APIconfig.json')
+var ipAdress = require('ip').address()
+
+log.info(ipAdress)
 
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const elApp = electron.app
@@ -69,10 +72,11 @@ try {
 require('./server')
 
 // 네이티브 브라우저 창을 만드는 모듈.
-const { BrowserWindow } = electron
+const { BrowserWindow, Menu } = electron
 
 log.info('program directory', elApp.getPath('userData'))
-
+// 메뉴 끄기
+// Menu.setApplicationMenu(false)
 // 하드웨어 가속 끄기
 elApp.disableHardwareAcceleration()
 
@@ -86,10 +90,20 @@ function createWindow() {
     width: 800,
     height: 1000,
     titleBarStyle: 'hiddenInset',
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      //enableRemoteModule: true,
+    },
   })
 
   // 그리고 현재 디렉터리의 client.html을 로드합니다.
   win.loadURL(`file://${__dirname}/client.html`)
+  // 웹 페이지 로드 완료
+  win.webContents.on('did-finish-load', (evt) => {
+    // ipAddress 이벤트 송신
+    win.webContents.send('ipAddress', ipAdress)
+  })
 
   // 개발자 도구를 엽니다.
   // win.webContents.openDevTools()

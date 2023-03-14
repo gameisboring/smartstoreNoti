@@ -1,9 +1,12 @@
-var socket = io('http://localhost:3000')
+var socket = io()
 var list = []
 var notiInfoReqInterval
 var notiPopUpInterval
-var notiSound = new Audio(`sounds/first.mp3`)
-var notiTextToSpeach = new Audio()
+var notiSound = document.querySelector('#notiSound')
+var notiTextToSpeach = document.querySelector('#notiTextToSpeach')
+var notiTime
+notiSound.load()
+notiTextToSpeach.load()
 
 /* document.querySelector('#start').addEventListener('click', (event) => {
   event.preventDefault()
@@ -16,7 +19,6 @@ async function notiReqCallback() {
 }
 
 async function notiPopUpCallback() {
-  notiSound.play()
   console.log('noti PopUp function')
   if (list.length > 0) {
     displayNotification()
@@ -33,7 +35,7 @@ socket.on('connection', (reason) => {
   console.log(reason)
   notiReqCallback()
   notiInfoReqInterval = setInterval(notiReqCallback, 10000)
-  notiPopUpInterval = setInterval(notiPopUpCallback, 5000)
+  notiPopUpInterval = setInterval(notiPopUpCallback, 7000)
 })
 
 socket.on('stop', (msg) => {
@@ -48,7 +50,7 @@ socket.on('resume', (msg) => {
   console.log(msg)
   Swal.resumeTimer()
   notiInfoReqInterval = setInterval(notiReqCallback, 10000)
-  notiPopUpInterval = setInterval(notiPopUpCallback, 5000)
+  notiPopUpInterval = setInterval(notiPopUpCallback, 7000)
 })
 
 socket.on('orderList', (msg) => {
@@ -71,7 +73,7 @@ socket.on('orderList', (msg) => {
 var displayNotification = () => {
   console.log('남은 알림 현재 : ' + list.length + '개 남음')
   var el = list.shift()
-
+  var time = 0
   if (el.quantity == 1) {
     notiSound.src = `sounds/first.mp3`
   } else if (el.quantity >= 10) {
@@ -83,33 +85,43 @@ var displayNotification = () => {
   notiSound.load()
   notiTextToSpeach.load()
 
-  console.log(
-    Number(notiTextToSpeach.duration + notiTextToSpeach.duration) * 1000
-  )
+  notiSound.onloadedmetadata = function () {
+    var soundDur = Math.floor(notiSound.duration * 1000)
 
-  Swal.fire({
-    title: `<span class="nick">${el.nick}</span>님
-    <span class="productName">${el.productName}</span> <span class="quantity">${el.quantity}</span>개
-    구매 감사합니다
-    <span class="point">${el.bj} ${el.point}</span>`,
-    html: `<span class="msgText">${el.text}</span>`,
-    timer: Number(notiTextToSpeach.duration + notiTextToSpeach.duration) * 1000,
-    imageUrl: '/noti/image',
-    imageHeight: 300,
-    imageAlt: 'A image',
-    color: '#716add',
-    showConfirmButton: false,
-    background: 'transparent',
-    backdrop: `rgba(0,0,0,0.0)`,
-    didOpen: async () => {
-      notiSound.play()
-      setTimeout(() => {
-        notiTextToSpeach.play()
-      }, 2000)
-    },
-  }).then((result) => {
-    if (result.dismiss === Swal.DismissReason.timer) {
-      console.log('I was closed by the timer')
+    notiTextToSpeach.onloadedmetadata = function () {
+      var ttsDur = Math.floor(notiTextToSpeach.duration * 1000) + 2000
+
+      console.log('soundDur', soundDur)
+      console.log('ttsDur', ttsDur)
+      console.log('time', soundDur + ttsDur + 2000)
+      Swal.fire({
+        title: `<span class="nick">${el.nick}</span>님
+      <span class="productName">${el.productName}</span> <span class="quantity">${el.quantity}</span>개
+      구매 감사합니다
+      <span class="point">${el.bj} ${el.point}</span>`,
+        html: `<span class="msgText">${el.text}</span>`,
+        timer: soundDur + ttsDur + 2000,
+        // timerProgressBar: true,
+        imageUrl: '/noti/image',
+        imageHeight: 300,
+        imageAlt: 'A image',
+        color: '#716add',
+        showConfirmButton: false,
+        background: 'transparent',
+        backdrop: `rgba(0,0,0,0.0)`,
+        didOpen: async () => {
+          notiSound.play()
+          setTimeout(() => {
+            notiTextToSpeach.play()
+          }, 2000)
+
+          time = 0
+        },
+      }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log('I was closed by the timer')
+        }
+      })
     }
-  })
+  }
 }

@@ -123,15 +123,19 @@
       <div class="links">
         <h2>
           구매알림
-          <a href="http://localhost:3000/notification" target="_blank"
-            >http://localhost:3000/notification</a
-          >
+          <a
+            href="http://localhost:3000/notification"
+            target="_blank"
+            id="notificationLink"
+          ></a>
         </h2>
         <h2>
           스코어보드
-          <a href="http://localhost:3000/board" target="_blank"
-            >http://localhost:3000/board</a
-          >
+          <a
+            href="http://localhost:3000/board"
+            target="_blank"
+            id="boardLink"
+          ></a>
         </h2>
       </div>
       <input type="submit" value="SAVE" class="saveBtn" />
@@ -143,6 +147,20 @@
   </body>
 
   <script>
+    const { ipcRenderer } = require('electron')
+
+    var notificationLink = document.querySelector('#notificationLink')
+    var boardLink = document.querySelector('#boardLink')
+    window.onload = () => {
+      ipcRenderer.on('ipAddress', (evt, ipAdress) => {
+        notificationLink.href = `http://${ipAdress}:3000/notification`
+        boardLink.href = `http://${ipAdress}:3000/board`
+
+        notificationLink.innerText = `http://${ipAdress}:3000/notification`
+        boardLink.innerText = `http://${ipAdress}:3000/board`
+      })
+    }
+
     var socket = io.connect('http://localhost:3000')
     const form = document.querySelector('#configInputForm')
     form.addEventListener('submit', async (event) => {

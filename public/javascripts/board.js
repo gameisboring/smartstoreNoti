@@ -21,9 +21,9 @@ socket.on('disconnect', (reason) => {
   clearInterval(boardInfoReqInterval)
 })
 
-/* socket.on('connection', (reason) => {
-   boardInfoReqInterval = setInterval(callback, 10000)
-}) */
+socket.on('connection', (reason) => {
+  boardInfoReqInterval = setInterval(callback, 10000)
+})
 
 function addListBar(data, rank) {
   var barImageFileName

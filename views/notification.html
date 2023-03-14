@@ -11,7 +11,14 @@
     <link rel="stylesheet" href="css/notification.css" />
   </head>
   <body>
-    <audio src="sounds/first.mp3" id="myAudio" autoplay="autoplay">
+    <audio src="sounds/first.mp3" id="notiSound" preload="metadata">
+      오디오 지원되지 않는 브라우저
+    </audio>
+    <audio
+      src="http://nstream.kr:1322/테스트"
+      id="notiTextToSpeach"
+      preload="metadata"
+    >
       오디오 지원되지 않는 브라우저
     </audio>
     <!-- <button id="start"></button> -->
