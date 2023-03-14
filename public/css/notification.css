@@ -34,7 +34,8 @@
 #start {
   width: 50vw;
   height: 50vh;
-  background-color: #00000063;
+  background-color: #00ff4c;
+  border: #00ff4c;
 }
 
 /* #myAudio {

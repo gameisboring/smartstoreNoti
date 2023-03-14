@@ -29,7 +29,7 @@ if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
 try {
   fs.readdirSync(elApp.getPath('userData') + '/list')
 } catch (error) {
-  console.log(`folder making .... ${elApp.getPath('userData')}/list`)
+  log.info(`folder making .... ${elApp.getPath('userData')}/list`)
   fs.mkdirSync(elApp.getPath('userData') + '/list')
 }
 
@@ -40,7 +40,7 @@ try {
       `/${dateFormat(hoursAgo(6))}_list.json`
   )
 } catch {
-  console.log(`file writing .... ${dateFormat(hoursAgo(6))}_list.json`)
+  log.info(`file writing .... ${dateFormat(hoursAgo(6))}_list.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
@@ -56,7 +56,7 @@ try {
       `/${dateFormat(hoursAgo(6))}_pointList.json`
   )
 } catch {
-  console.log(`file writing .... ${dateFormat(hoursAgo(6))}_pointList.json`)
+  log.info(`file writing .... ${dateFormat(hoursAgo(6))}_pointList.json`)
   fs.writeFileSync(
     elApp.getPath('userData') +
       '/list' +
@@ -71,9 +71,7 @@ require('./server')
 // 네이티브 브라우저 창을 만드는 모듈.
 const { BrowserWindow } = electron
 
-console.log(elApp.getPath('home'))
-console.log(elApp.getPath('appData'))
-console.log(elApp.getPath('userData'))
+log.info('program directory', elApp.getPath('userData'))
 
 // 하드웨어 가속 끄기
 elApp.disableHardwareAcceleration()
