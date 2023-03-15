@@ -22,7 +22,7 @@ const ApiControls = require('./api')
 const api = new ApiControls()
 
 app2.use(express.static('public'))
-app2.use(express.static(process.resourcesPath + '/app.asar/public'))
+// app2.use(express.static(process.resourcesPath + '/app.asar/public'))
 
 app2.get('/', function (req, res) {
   res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' })

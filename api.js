@@ -53,12 +53,6 @@ module.exports = class ApiControls {
         },
       })
         .then(function (response) {
-          // log.info(
-          //   'OAuth Token Expires in',
-          //   `${Math.floor(response.data.expires_in / 60)}분 ${
-          //     response.data.expires_in % 60
-          //   }초`
-          // )
           resolve(response.data.access_token)
         })
         .catch(function (error) {
@@ -119,9 +113,6 @@ module.exports = class ApiControls {
           `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${mappedData[i].productName} | 수량: ${mappedData[i].quantity}ea | 구매자: ${mappedData[i].nick} | BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
         )
 
-        // io.emit('orderList', mappedData[i])
-        // io.emit('scoreboard', await apiControls.scoreBoardToUsableData())
-
         // 불러온 기존데이터 리스트에 추가
         orderedList.push({
           no: orderedList.length,
@@ -139,6 +130,8 @@ module.exports = class ApiControls {
       }
     }
     // 순회 마치고 새롭게 추가된 데이터 반환
+    io.emit('orderList', newOrders)
+    io.emit('scoreboard', await apiControls.scoreBoardToUsableData())
     return newOrders
   }
 

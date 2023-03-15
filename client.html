@@ -144,10 +144,16 @@
       <button id="notiStop" class="saveBtn">알림 STOP</button>
       <button id="notiResume" class="saveBtn">알림 RESUME</button>
     </div>
+
+    <div id="test"></div>
+    <div id="test2"></div>
   </body>
 
   <script>
-    const { ipcRenderer } = require('electron')
+    const { ipcRenderer, app } = require('electron')
+    const fs = require('fs')
+
+    document.getElementById('test').innerHTML = process.resourcesPath
 
     var notificationLink = document.querySelector('#notificationLink')
     var boardLink = document.querySelector('#boardLink')

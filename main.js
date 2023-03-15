@@ -6,20 +6,17 @@ const log = require('electron-log')
 const basicAPIconfig = require('./APIconfig.json')
 var ipAdress = require('ip').address()
 
+/**
+ * TODO
+ * 1. 집계방식 다른걸로 api 함수 하나 더 만들기
+ * 2. client html 작업
+ * 3. 경로 ../Romaing 쪽에 있게 하지 말고 client resource 쪽으로 재설정하기
+ */
+
 log.info(ipAdress)
 
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const elApp = electron.app
-const apiSchema = {
-  CLIENT_ID: '',
-  CLIENT_SECRET: '',
-  ACCOUNT_ID: '',
-  NICK_OPT: '아프리카닉네임',
-  TEXT_OPT: '메세지',
-  SIZE_OPT: '사이즈',
-  BJ_OPT: 'BJ',
-  POINT_OPT: '플마',
-}
 
 if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
   fs.writeFileSync(
@@ -104,6 +101,8 @@ function createWindow() {
     // ipAddress 이벤트 송신
     win.webContents.send('ipAddress', ipAdress)
   })
+
+  log.info(elApp.getAppPath())
 
   // 개발자 도구를 엽니다.
   // win.webContents.openDevTools()
