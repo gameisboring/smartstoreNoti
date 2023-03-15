@@ -19,10 +19,11 @@ const io = SocketIO(server, { path: '/socket.io' })
 module.exports = { io }
 
 const ApiControls = require('./api')
+// const ttsConfig = require('./ttsConfig')
 const api = new ApiControls()
 
 app2.use(express.static('public'))
-// app2.use(express.static(process.resourcesPath + '/app.asar/public'))
+app2.use(express.static(process.resourcesPath + '/public'))
 
 app2.get('/', function (req, res) {
   res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' })
@@ -86,11 +87,11 @@ app2.get('/scoreboard/get', async function (req, res) {
 /* 설정 가져오기 */
 app2.get('/config', function (req, res) {
   log.info(`GET /config`)
-  if (!fs.existsSync(elApp.getPath('userData') + '/APIconfig.json')) {
+  if (!fs.existsSync(process.resourcesPath + '/APIconfig.json')) {
     log.info(`please write file "APIconfig.json"`)
   } else {
     res.send(
-      JSON.parse(fs.readFileSync(elApp.getPath('userData') + '/APIconfig.json'))
+      JSON.parse(fs.readFileSync(process.resourcesPath + '/APIconfig.json'))
     )
   }
 })
@@ -99,12 +100,15 @@ app2.get('/config', function (req, res) {
 app2.post('/config', function (req, res) {
   log.info(`POST /config`)
   if (req.body) {
-    fs.writeFileSync(
-      elApp.getPath('userData') + '/APIconfig.json',
+    fs.writeFile(
+      process.resourcesPath + '/APIconfig.json',
       JSON.stringify(req.body),
-      'utf-8'
+      'utf-8',
+      () => {
+        console.log(JSON.stringify(req.body))
+        res.json({ message: '입력되었습니다' })
+      }
     )
-    res.json({ message: '입력되었습니다' })
   } else {
     res.json({ message: '입력에 실패했습니다' })
   }
@@ -112,12 +116,17 @@ app2.post('/config', function (req, res) {
 
 app2.get('/noti/image', function (req, res) {
   log.info(`GET /noti/image`)
-  if (fs.existsSync(elApp.getPath('userData') + '/noti.png')) {
-    res.sendFile(elApp.getPath('userData') + '/noti.png')
+  if (fs.existsSync(process.resourcesPath + '/noti.png')) {
+    res.sendFile(process.resourcesPath + '/noti.png')
   } else {
     res.sendFile(__dirname + '/public/images/handsup.png')
   }
 })
+
+// app2.get('/noti/config', async function (req, res) {
+//   log.info(`GET /noti/config`)
+//   res.send(await ttsConfig())
+// })
 
 app2.get('/noti/stop', function (req, res) {
   log.info(`GET /noti/stop`)

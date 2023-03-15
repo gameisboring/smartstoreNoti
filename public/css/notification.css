@@ -8,8 +8,6 @@
 
 * {
   text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000;
-  /* -webkit-text-stroke: 1px black; */
-
   font-family: 'KCC-Ganpan';
 }
 
@@ -30,14 +28,3 @@
   font-size: 45px;
   color: red;
 }
-
-#start {
-  width: 50vw;
-  height: 50vh;
-  background-color: #00ff4c;
-  border: #00ff4c;
-}
-
-/* #myAudio {
-  display: none;
-} */

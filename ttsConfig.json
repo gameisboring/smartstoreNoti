@@ -1,0 +1,5 @@
+[
+  { "이상": 1, "이하": 4, "sound": "first.mp3" },
+  { "이상": 5, "이하": 9, "sound": "second.mp3" },
+  { "이상": 10, "sound": "third.mp3" }
+]

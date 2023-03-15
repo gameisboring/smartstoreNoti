@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Open Sans';
+        background: #2c3e50;
+        color: #ecf0f1;
+        line-height: 1.618em;
+        margin: 0;
+      }
+      .wrapper {
+        max-width: 50rem;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .tabs {
+        position: relative;
+        top: 0;
+        margin: 0;
+        background: #000000;
+        height: 970px;
+      }
+      .tabs::before,
+      .tabs::after {
+        content: '';
+        display: table;
+      }
+      .tabs::after {
+        clear: both;
+      }
+      .tab {
+        float: left;
+      }
+      .tab-switch {
+        display: none;
+      }
+      .tab-label {
+        position: relative;
+        display: block;
+        line-height: 2.75em;
+        height: 48px;
+        padding: 0 30px;
+        background: #000000;
+        border-right: 3px solid #ffffff;
+        color: #fff;
+        cursor: pointer;
+        top: 0;
+        transition: all 0.25s;
+      }
+      .tab-label:hover {
+        background: #2c3e50;
+        top: -0.25rem;
+        transition: top 0.25s;
+      }
+      .tab-content {
+        position: absolute;
+        z-index: 1;
+        top: 47px;
+        left: 0;
+        padding: 30px;
+        background: #000000;
+        color: #ffffff;
+        opacity: 0;
+        height: calc(100% - 48px - 60px - 30px);
+        transition: all 0.35s;
+      }
+      .tab-switch:checked + .tab-label {
+        background: #2c3e50;
+        color: #fff;
+        border-bottom: 0;
+        border-right: 0.125rem solid #fff;
+        transition: all 0.35s;
+        z-index: 1;
+        top: -0.0625rem;
+      }
+      .tab-switch:checked + label + .tab-content {
+        z-index: 2;
+        opacity: 1;
+        transition: all 0.35s;
+      }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="tabs">
+        <div class="tab">
+          <input
+            type="radio"
+            name="css-tabs"
+            id="tab-1"
+            checked
+            class="tab-switch"
+          />
+          <label for="tab-1" class="tab-label">Tab One</label>
+          <div class="tab-content">
+            <form action="" method="post" id="configInputForm">
+              <h1 id="headline">API 설정</h1>
+              <div class="inputGroup">
+                <span>Client ID</span>
+                <input type="text" name="CLIENT_ID" id="CLIENT_ID" />
+              </div>
+              <div class="inputGroup">
+                <span>Client Secret</span>
+                <input type="text" name="CLIENT_SECRET" id="CLIENT_SECRET" />
+              </div>
+              <div class="inputGroup">
+                <span>Account ID</span>
+                <input type="text" name="ACCOUNT_ID" id="ACCOUNT_ID" />
+              </div>
+              <div class="inputGroup">
+                <span>닉네임 옵션이름</span>
+                <input type="text" name="NICK_OPT" id="NICK_OPT" />
+              </div>
+              <div class="inputGroup">
+                <span>메세지 옵션이름</span>
+                <input type="text" name="TEXT_OPT" id="TEXT_OPT" />
+              </div>
+              <div class="inputGroup">
+                <span>사이즈 옵션이름</span>
+                <input type="text" name="SIZE_OPT" id="SIZE_OPT" />
+              </div>
+              <div class="inputGroup">
+                <span>BJ 옵션이름</span>
+                <input type="text" name="BJ_OPT" id="BJ_OPT" />
+              </div>
+              <div class="inputGroup">
+                <span>점수 옵션이름</span>
+                <input type="text" name="POINT_OPT" id="POINT_OPT" />
+              </div>
+              <div class="inputGroup">
+                <span>상품 ID</span>
+                <textarea
+                  name="PRODUCT_ID"
+                  id="PRODUCT_ID"
+                  cols="30"
+                  rows="5"
+                ></textarea>
+              </div>
+              <div class="inputGroup">
+                <span>BJ 점수 표시(발주확인건 집계)</span>
+                <input
+                  type="checkbox"
+                  name="SHOW_BJ_POINT"
+                  id="SHOW_BJ_POINT"
+                />
+              </div>
+
+              <div class="links">
+                <h2>
+                  구매알림
+                  <a
+                    href="http://localhost:3000/notification"
+                    target="_blank"
+                    id="notificationLink"
+                  ></a>
+                </h2>
+                <h2>
+                  스코어보드
+                  <a
+                    href="http://localhost:3000/board"
+                    target="_blank"
+                    id="boardLink"
+                  ></a>
+                </h2>
+              </div>
+              <input type="submit" value="SAVE" class="saveBtn" />
+            </form>
+            <div id="test"></div>
+          </div>
+        </div>
+        <div class="tab">
+          <input type="radio" name="css-tabs" id="tab-2" class="tab-switch" />
+          <label for="tab-2" class="tab-label">Tab Two</label>
+          <div class="tab-content">
+            My father now and then sending me small sums of money, I laid them
+            out in learning navigation, and other parts of the mathematics,
+            useful to those who intend to travel, as I always believed it would
+            be, some time or other, my fortune to do.
+          </div>
+        </div>
+        <div class="tab">
+          <input type="radio" name="css-tabs" id="tab-3" class="tab-switch" />
+          <label for="tab-3" class="tab-label">Tab Three</label>
+          <div class="tab-content">
+            When I left Mr. Bates, I went down to my father: where, by the
+            assistance of him and my uncle John, and some other relations, I got
+            forty pounds, and a promise of thirty pounds a year to maintain me
+            at Leyden: there I studied physic two years and seven months,
+            knowing it would be useful in long voyages.
+          </div>
+        </div>
+      </div>
+      <div id="notiControl">
+        <button id="notiStop" class="saveBtn">알림 STOP</button>
+        <button id="notiResume" class="saveBtn">알림 RESUME</button>
+      </div>
+    </div>
+  </body>
+  <script>
+    const { ipcRenderer, app } = require('electron')
+    const fs = require('fs')
+
+    document.getElementById('test').innerHTML = process.resourcesPath
+
+    var notificationLink = document.querySelector('#notificationLink')
+    var boardLink = document.querySelector('#boardLink')
+    window.onload = () => {
+      ipcRenderer.on('ipAddress', (evt, ipAdress) => {
+        notificationLink.href = `http://${ipAdress}:3000/notification`
+        boardLink.href = `http://${ipAdress}:3000/board`
+
+        notificationLink.innerText = `http://${ipAdress}:3000/notification`
+        boardLink.innerText = `http://${ipAdress}:3000/board`
+      })
+    }
+
+    var socket = io.connect('http://localhost:3000')
+    const form = document.querySelector('#configInputForm')
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      let response = await fetch('http://localhost:3000/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          CLIENT_ID: document.getElementById('CLIENT_ID').value,
+          CLIENT_SECRET: document.getElementById('CLIENT_SECRET').value,
+          ACCOUNT_ID: document.getElementById('ACCOUNT_ID').value,
+          PRODUCT_ID: document
+            .getElementById('PRODUCT_ID')
+            .value.split(' ')
+            .join('')
+            .split(','),
+          NICK_OPT: document.getElementById('NICK_OPT').value,
+          TEXT_OPT: document.getElementById('TEXT_OPT').value,
+          SIZE_OPT: document.getElementById('SIZE_OPT').value,
+          BJ_OPT: document.getElementById('BJ_OPT').value,
+          POINT_OPT: document.getElementById('POINT_OPT').value,
+          SHOW_BJ_POINT: document.getElementById('SHOW_BJ_POINT').checked,
+        }),
+      })
+
+      let result = await response.json()
+
+      alert(result.message)
+    })
+
+    fetch('http://localhost:3000/config')
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelector('#CLIENT_ID').value = data.CLIENT_ID
+        document.querySelector('#CLIENT_SECRET').value = data.CLIENT_SECRET
+        document.querySelector('#ACCOUNT_ID').value = data.ACCOUNT_ID
+        document.querySelector('#NICK_OPT').value = data.NICK_OPT
+        document.querySelector('#TEXT_OPT').value = data.TEXT_OPT
+        document.querySelector('#SIZE_OPT').value = data.SIZE_OPT
+        document.querySelector('#BJ_OPT').value = data.BJ_OPT
+        document.querySelector('#POINT_OPT').value = data.POINT_OPT
+        document.getElementById('PRODUCT_ID').value = data.PRODUCT_ID
+        document.getElementById('SHOW_BJ_POINT').checked = data.SHOW_BJ_POINT
+      })
+
+    var notiStop = document.querySelector('#notiStop')
+    var notiResume = document.querySelector('#notiResume')
+
+    notiStop.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiStop.style.display = 'none'
+      notiResume.style.display = 'block'
+      await fetch('http://localhost:3000/noti/stop')
+    })
+
+    notiResume.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiResume.style.display = 'none'
+      notiStop.style.display = 'block'
+      await fetch('http://localhost:3000/noti/resume')
+    })
+  </script>
+</html>

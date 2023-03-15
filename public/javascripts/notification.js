@@ -4,14 +4,6 @@ var notiInfoReqInterval
 var notiPopUpInterval
 var notiSound = document.querySelector('#notiSound')
 var notiTextToSpeach = document.querySelector('#notiTextToSpeach')
-var notiTime
-notiSound.load()
-notiTextToSpeach.load()
-
-/* document.querySelector('#start').addEventListener('click', (event) => {
-  event.preventDefault()
-  document.querySelector('#start').style.display = 'none'
-}) */
 
 async function notiReqCallback() {
   console.log('noti information request function')
@@ -74,12 +66,14 @@ var displayNotification = () => {
   console.log('남은 알림 현재 : ' + list.length + '개 남음')
   var el = list.shift()
   var time = 0
-  if (el.quantity == 1) {
+  if (el.quantity >= 1 && el.quantity < 5) {
     notiSound.src = `sounds/first.mp3`
+  } else if (el.quantity >= 5 && el.quantity < 10) {
+    notiSound.src = `sounds/second.mp3`
   } else if (el.quantity >= 10) {
     notiSound.src = `sounds/third.mp3`
-  } else if (el.quantity >= 5) {
-    notiSound.src = `sounds/second.mp3`
+  } else {
+    return
   }
   notiTextToSpeach = new Audio('http://nstream.kr:1322/' + el.text)
   notiSound.load()
