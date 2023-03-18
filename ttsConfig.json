@@ -1,5 +1,11 @@
-[
-  { "이상": 1, "이하": 4, "sound": "first.mp3" },
-  { "이상": 5, "이하": 9, "sound": "second.mp3" },
-  { "이상": 10, "sound": "third.mp3" }
-]
+{
+  "FIRST_SOUND_UP": "1",
+  "FIRST_SOUND_DOWN": "4",
+  "SECOND_SOUND_UP": "5",
+  "SECOND_SOUND_DOWN": "9",
+  "THIRD_SOUND_UP": "10",
+  "THIRD_SOUND_DOWN": "100",
+  "FIRST_SOUND_FILE": "first.mp3",
+  "SECOND_SOUND_FILE": "second.mp3",
+  "THIRD_SOUND_FILE": "third.mp3"
+}

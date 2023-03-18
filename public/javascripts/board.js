@@ -1,14 +1,16 @@
 var socket = io()
 var list = []
+var boardInfoReqInterval
 
 var body = document.querySelector('#main .body')
-socket.emit('scoreboard', new Date().getTime())
+socket.emit('getScoreboard', new Date().getTime())
 
 async function callback() {
-  socket.emit('scoreboard', new Date().getTime())
+  socket.emit('getScoreboard', new Date().getTime())
 }
 
 socket.on('scoreboard', (msg) => {
+  console.log(msg)
   var html = ''
   for (var i in msg.result) {
     html += addListBar(msg.result[i], Number(i) + 1)
@@ -40,7 +42,7 @@ function addListBar(data, rank) {
       barImageFileName = 3
       break
     }
-    case rank < 7: {
+    case rank > 7: {
       barImageFileName = 'low'
       break
     }

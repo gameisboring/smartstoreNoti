@@ -1,58 +1,52 @@
-var socket = io()
-var list = []
-var notiInfoReqInterval
-var notiPopUpInterval
-var notiSound = document.querySelector('#notiSound')
-var notiTextToSpeach = document.querySelector('#notiTextToSpeach')
+'use strict'
+
+const socket = io()
+const list = new Array()
+var notiInfoReqInterval = null
+var notiPopUpInterval = null
 
 async function notiReqCallback() {
-  console.log('noti information request function')
-  socket.emit('orderList')
+  socket.emit('getOrderList')
 }
 
-async function notiPopUpCallback() {
-  console.log('noti PopUp function')
-  if (list.length > 0) {
-    displayNotification()
-  }
-}
-
-socket.on('disconnect', (reason) => {
-  console.log(reason)
+socket.on('disconnect', function (reason) {
   clearInterval(notiInfoReqInterval)
-  clearInterval(notiPopUpInterval)
+  clearTimeout(notiPopUpInterval)
 })
 
-socket.on('connection', (reason) => {
-  console.log(reason)
+socket.on('connection', function (reason) {
   notiReqCallback()
-  notiInfoReqInterval = setInterval(notiReqCallback, 10000)
-  notiPopUpInterval = setInterval(notiPopUpCallback, 7000)
+  notiInfoReqInterval = setInterval(function () {
+    socket.emit('getOrderList')
+  }, 10000)
+
+  notiPopUpInterval = setTimeout(tick, 100)
 })
 
-socket.on('stop', (msg) => {
+socket.on('stop', function (msg) {
   console.log(msg)
   Swal.stopTimer()
 
   clearInterval(notiInfoReqInterval)
-  clearInterval(notiPopUpInterval)
+  clearTimeout(notiPopUpInterval)
 })
 
-socket.on('resume', (msg) => {
+socket.on('resume', function (msg) {
   console.log(msg)
   Swal.resumeTimer()
-  notiInfoReqInterval = setInterval(notiReqCallback, 10000)
-  notiPopUpInterval = setInterval(notiPopUpCallback, 7000)
+  notiInfoReqInterval = setInterval(function () {
+    socket.emit('getOrderList')
+  }, 10000)
+
+  notiPopUpInterval = setTimeout(tick, 100)
 })
 
-socket.on('orderList', (msg) => {
+socket.on('orderList', function (msg) {
+  console.log(msg)
   if (typeof msg == 'string') {
-    console.log(msg)
   } else if (typeof msg == 'object') {
-    console.log(msg)
-    console.log('new Orders ' + msg.length)
     if (msg.length >= 0) {
-      msg.forEach((element) => {
+      msg.forEach(function (element) {
         list.push(element)
       })
     }
@@ -62,60 +56,74 @@ socket.on('orderList', (msg) => {
   }
 })
 
-var displayNotification = () => {
-  console.log('남은 알림 현재 : ' + list.length + '개 남음')
-  var el = list.shift()
-  var time = 0
-  if (el.quantity >= 1 && el.quantity < 5) {
-    notiSound.src = `sounds/first.mp3`
-  } else if (el.quantity >= 5 && el.quantity < 10) {
-    notiSound.src = `sounds/second.mp3`
-  } else if (el.quantity >= 10) {
-    notiSound.src = `sounds/third.mp3`
-  } else {
-    return
-  }
-  notiTextToSpeach = new Audio('http://nstream.kr:1322/' + el.text)
-  notiSound.load()
-  notiTextToSpeach.load()
+async function tick() {
+  console.log('남은 주문 : ' + list.length + '개')
+  if (list.length > 0) {
+    const el = list.shift()
+    const API = await fetch('public/myJson.json')
+    console.log(API)
+    var notiSound = new Audio()
+    var notiTextToSpeach = new Audio(
+      `http://nstream.kr:1322/` +
+        `${el.nick}님. ${el.productName} ${el.quantity}개 구매 감사합니다..
+        ${el.bj ? el.bj : ''} ${el.point ? el.point : ''}..${el.text}`
+    )
 
-  notiSound.onloadedmetadata = function () {
-    var soundDur = Math.floor(notiSound.duration * 1000)
-
-    notiTextToSpeach.onloadedmetadata = function () {
-      var ttsDur = Math.floor(notiTextToSpeach.duration * 1000) + 2000
-
-      console.log('soundDur', soundDur)
-      console.log('ttsDur', ttsDur)
-      console.log('time', soundDur + ttsDur + 2000)
-      Swal.fire({
-        title: `<span class="nick">${el.nick}</span>님
-      <span class="productName">${el.productName}</span> <span class="quantity">${el.quantity}</span>개
-      구매 감사합니다
-      <span class="point">${el.bj} ${el.point}</span>`,
-        html: `<span class="msgText">${el.text}</span>`,
-        timer: soundDur + ttsDur + 2000,
-        // timerProgressBar: true,
-        imageUrl: '/noti/image',
-        imageHeight: 300,
-        imageAlt: 'A image',
-        color: '#716add',
-        showConfirmButton: false,
-        background: 'transparent',
-        backdrop: `rgba(0,0,0,0.0)`,
-        didOpen: async () => {
-          notiSound.play()
-          setTimeout(() => {
-            notiTextToSpeach.play()
-          }, 2000)
-
-          time = 0
-        },
-      }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.timer) {
-          console.log('I was closed by the timer')
-        }
-      })
+    if (el.quantity >= 1 && el.quantity < 5) {
+      notiSound.src = `sounds/first.mp3`
+    } else if (el.quantity >= 5 && el.quantity < 10) {
+      notiSound.src = `sounds/second.mp3`
+    } else if (el.quantity >= 10) {
+      notiSound.src = `sounds/third.mp3`
+    } else {
+      return
     }
+
+    notiSound.load()
+    notiTextToSpeach.load()
+
+    notiSound.onloadedmetadata = function () {
+      notiTextToSpeach.onloadedmetadata = function () {
+        var timer =
+          Math.floor(notiSound.duration * 1000) +
+          Math.floor(notiTextToSpeach.duration * 1000) +
+          2000
+        notiPopUpInterval = setTimeout(tick, timer)
+
+        Swal.fire({
+          title: `<span class="nick">${el.nick}</span>님
+        <span class="productName">${
+          el.productName
+        }</span> <span class="quantity">${el.quantity}</span>개
+        구매 감사합니다
+        ${el.bj ? '<span class="point">' + el.bj + '</span>' : ''} ${
+            el.point ? '<span class="point">' + el.point + '</span>' : ''
+          } `,
+          html: `<span class="msgText">${el.text}</span>`,
+          timer: timer,
+          // timerProgressBar: true,
+          imageUrl: '/noti/image',
+          imageHeight: 300,
+          imageAlt: 'A image',
+          color: '#716add',
+          showConfirmButton: false,
+          background: 'transparent',
+          backdrop: `rgba(0,0,0,0.0)`,
+          didOpen: async () => {
+            notiSound.play()
+            var setTimeoutID = setTimeout(() => {
+              notiTextToSpeach.play()
+              clearTimeout(setTimeoutID)
+            }, 2000)
+          },
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+          }
+        })
+      }
+    }
+  } else {
+    notiPopUpInterval = setTimeout(tick, 1000)
   }
 }

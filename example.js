@@ -533,27 +533,135 @@ const 조합형3 = [
     },
   },
 ].map((productOrder) => {
-  const options = productOrder.productOrder.productOption.split('/')
+  const options =
+    '아프리카닉네임: 테스트트트 / 메세지: 메세지 테스트 메세지 테스트  / 사이즈: 240 / BJ: 시원 / 플마: 플러스'
   return {
     quantity: productOrder.productOrder.quantity,
-    nick: options[0].split('아프리카닉네임' + ': ')[1],
-    text: options[1].split('메세지' + ': ')[1],
-    size: options[2].split('사이즈' + ': ')[1],
-    bj: options[3].split('BJ' + ': ')[1],
-    plus: options[4].split('플마' + ': ')[1],
-    productName: productOrder.productOrder.productName.split(']')[1],
+    nick: options.match(/(?<=\아프리카닉네임: )(.*?)(?= \/)/g)
+      ? options.match(/(?<=\아프리카닉네임: )(.*?)(?= \/)/g)[0]
+      : '',
+    text: options.match(/(?<=\메세지: )(.*?)(?= \/)/g)
+      ? options.match(/(?<=\메세지: )(.*?)(?= \/)/g)[0]
+      : '',
+    size: options.match(/(?<=\사이즈: )(.*?)(?= \/)/g)[0],
+    bj: options.match(/(?<=\BJ: )(.*?)(?= \/)/g)[0],
+    plus: options.match(/(?<=\플마: )(.*?)(?= \/)/g)[0],
+    productName: productOrder.productOrder.productName.split(']')[1].trim(),
   }
 })
 
 const 결과 = [
   {
-    nick: '테스트트트 ',
-    text: '메세지 테스트 메세지 테스트  ',
-    size: '240 ',
-    bj: '시원 ',
-    plus: '플러스',
+    productOrderId: '2023031660411041',
+    quantity: 1,
+    nick: '홈플러스',
+    text: '시그니쳐 물티슈 WET WIPES',
+    size: '260',
     productName: ' 뭉탱이 케인 슬리퍼 조합형',
+    date: '2023-03-16T15:53:27.0+09:00',
+  },
+  {
+    productOrderId: '2023031660484041',
+    quantity: 1,
+    nick: '시시호시',
+    text: '벡셀 건전지',
+    size: '230',
+    productName: ' 뭉탱이 케인 슬리퍼 조합형',
+    date: '2023-03-16T15:55:27.0+09:00',
+  },
+  {
+    productOrderId: '2023031663337591',
+    quantity: 1,
+    nick: 'ABC마트 코리아',
+    text: '이용해 주셔서 감사합니다.',
+    size: '240',
+    productName: ' 뭉탱이 케인 슬리퍼 조합형',
+    date: '2023-03-16T17:20:40.0+09:00',
   },
 ]
 
 module.exports = { notiData, 추가상품형, 추가상품형2 }
+
+let timerId = setTimeout(function tick() {
+  alert('tick')
+  timerId = setTimeout(tick, 2000) /* ...code */
+}, 2000)
+
+neee = [
+  {
+    productOrder: {
+      quantity: 1,
+      mallId: 'ncp_1o6cr6_01',
+      productOrderId: '2023031656268291',
+      productClass: '조합형옵션상품',
+      productOrderStatus: 'PAYED',
+      productName: '[케인] 뭉탱이 케인 슬리퍼 조합형',
+      productId: '8174097567',
+      itemNo: '29773646947',
+      placeOrderStatus: 'NOT_YET',
+      optionPrice: 0,
+      productOption:
+        '아프리카닉네임: 홈플러스 / 메세지: 시그니쳐 물티슈 WET WIPES / 사이즈: 260 / BJ: 영민 / 플마: 플러스',
+      unitPrice: 10,
+      productDiscountAmount: 0,
+      deliveryPolicyType: '무료',
+      deliveryFeeAmount: 0,
+      sectionDeliveryFee: 0,
+      totalPaymentAmount: 10,
+      packageNumber: '2023031621712994',
+      shippingFeeType: '무료',
+      shippingDueDate: '2023-04-05T23:59:59.0+09:00',
+      deliveryDiscountAmount: 0,
+      optionCode: '29773646947',
+      shippingAddress: [Object],
+      totalProductAmount: 10,
+      sellerBurdenDiscountAmount: 0,
+      saleCommission: 0,
+      expectedDeliveryMethod: 'DELIVERY',
+      takingAddress: [Object],
+      commissionRatingType: '결제수수료',
+      commissionPrePayStatus: 'GENERAL_PRD',
+      paymentCommission: 0,
+      expectedSettlementAmount: 10,
+      inflowPath: '네이버페이>홈(네이버쇼핑)',
+      channelCommission: 0,
+      knowledgeShoppingSellingInterlockCommission: 0,
+    },
+    order: {
+      ordererTel: '01032883152',
+      ordererNo: '100210162',
+      payLocationType: 'PC',
+      orderId: '2023031619926721',
+      paymentDate: '2023-03-16T14:04:33.0+09:00',
+      orderDiscountAmount: 0,
+      orderDate: '2023-03-16T14:04:28.0+09:00',
+      chargeAmountPaymentAmount: 0,
+      generalPaymentAmount: 0,
+      naverMileagePaymentAmount: 10,
+      ordererId: 'daum****',
+      ordererName: '선현규',
+      paymentMeans: '포인트결제',
+      isDeliveryMemoParticularInput: 'false',
+      payLaterPaymentAmount: 0,
+    },
+  },
+]
+
+const pointList = [
+  {
+    no: 0,
+    nick: '정우성',
+    productOrderId: '2023031824963331',
+    productId: '8174097567',
+    orderDate: '2023-03-18T12:26:08.0+09:00',
+    quantity: 1,
+  },
+  {
+    no: 1,
+    nick: '멀티비타민 포 맨',
+    productOrderId: '2023031827469611',
+    productId: '7972531264',
+    orderDate: '2023-03-18T14:16:05.0+09:00',
+    quantity: 1,
+  },
+]

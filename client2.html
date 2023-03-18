@@ -5,15 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.js"></script>
     <style>
       * {
         box-sizing: border-box;
       }
+
       body {
         font-family: 'Open Sans';
         background: #2c3e50;
         color: #ecf0f1;
-        line-height: 1.618em;
+        line-height: 24px;
         margin: 0;
       }
       .wrapper {
@@ -26,7 +32,7 @@
         top: 0;
         margin: 0;
         background: #000000;
-        height: 970px;
+        height: 922px;
       }
       .tabs::before,
       .tabs::after {
@@ -86,11 +92,24 @@
         opacity: 1;
         transition: all 0.35s;
       }
+
+      .colored-toast.swal2-icon-success {
+        background-color: #a5dc86 !important;
+      }
+
+      .colored-toast.swal2-icon-error {
+        background-color: #f27474 !important;
+      }
+
+      #ttsConfigInputForm {
+        line-height: 36px;
+      }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
   </head>
   <body>
+    <div id="test"></div>
     <div class="wrapper">
       <div class="tabs">
         <div class="tab">
@@ -104,7 +123,7 @@
           <label for="tab-1" class="tab-label">Tab One</label>
           <div class="tab-content">
             <form action="" method="post" id="configInputForm">
-              <h1 id="headline">API 설정</h1>
+              <h1 class="headline">API 설정</h1>
               <div class="inputGroup">
                 <span>Client ID</span>
                 <input type="text" name="CLIENT_ID" id="CLIENT_ID" />
@@ -138,16 +157,29 @@
                 <input type="text" name="POINT_OPT" id="POINT_OPT" />
               </div>
               <div class="inputGroup">
-                <span>상품 ID</span>
+                <span>조회 할 상품 ID</span>
                 <textarea
                   name="PRODUCT_ID"
                   id="PRODUCT_ID"
                   cols="30"
-                  rows="5"
+                  rows="3"
                 ></textarea>
               </div>
               <div class="inputGroup">
-                <span>BJ 점수 표시(발주확인건 집계)</span>
+                <span>상품 판매 이벤트</span>
+                <input
+                  type="checkbox"
+                  name="SALE_EVENT_CHECK"
+                  id="SALE_EVENT_CHECK"
+                /><span>상품 ID </span
+                ><input
+                  type="text"
+                  name="SALE_EVENT_PRODUCT_ID"
+                  id="SALE_EVENT_PRODUCT_ID"
+                />
+              </div>
+              <div class="inputGroup">
+                <span>BJ, 점수 표시 (발주확인건 집계)</span>
                 <input
                   type="checkbox"
                   name="SHOW_BJ_POINT"
@@ -155,37 +187,94 @@
                 />
               </div>
 
-              <div class="links">
-                <h2>
-                  구매알림
-                  <a
-                    href="http://localhost:3000/notification"
-                    target="_blank"
-                    id="notificationLink"
-                  ></a>
-                </h2>
-                <h2>
-                  스코어보드
-                  <a
-                    href="http://localhost:3000/board"
-                    target="_blank"
-                    id="boardLink"
-                  ></a>
-                </h2>
-              </div>
-              <input type="submit" value="SAVE" class="saveBtn" />
+              <input type="submit" value="API 설정 저장" class="saveBtn" />
             </form>
-            <div id="test"></div>
+            <div class="links">
+              <h2>
+                구매알림
+                <a
+                  href="http://localhost:3000/notification"
+                  target="_blank"
+                  id="notificationLink"
+                ></a>
+              </h2>
+              <h2>
+                스코어보드
+                <a
+                  href="http://localhost:3000/board"
+                  target="_blank"
+                  id="boardLink"
+                ></a>
+              </h2>
+            </div>
+            <div class="count">
+              현재 상품 판매 개수 : <span id="preCount"></span>
+              <br />
+              총 판매 개수 : <span id="totalCount"></span>
+            </div>
           </div>
         </div>
         <div class="tab">
           <input type="radio" name="css-tabs" id="tab-2" class="tab-switch" />
           <label for="tab-2" class="tab-label">Tab Two</label>
           <div class="tab-content">
-            My father now and then sending me small sums of money, I laid them
-            out in learning navigation, and other parts of the mathematics,
-            useful to those who intend to travel, as I always believed it would
-            be, some time or other, my fortune to do.
+            <h1>구매 알림 설정</h1>
+            <form
+              action="http://localhost:3000/config/tts"
+              method="POST"
+              id="ttsConfigInputForm"
+              enctype="multipart/form-data"
+            >
+              <input
+                type="number"
+                name="FIRST_SOUND_UP"
+                id="FIRST_SOUND_UP"
+              />이상
+              <input
+                type="number"
+                name="FIRST_SOUND_DOWN"
+                id="FIRST_SOUND_DOWN"
+              />이하
+              <input
+                type="file"
+                name="soundFile"
+                id="FIRST_SOUND_FILE"
+                accept="audio/*"
+              />
+              <input
+                type="number"
+                name="SECOND_SOUND_UP"
+                id="SECOND_SOUND_UP"
+              />이상
+              <input
+                type="number"
+                name="SECOND_SOUND_DOWN"
+                id="SECOND_SOUND_DOWN"
+              />이하
+              <input
+                type="file"
+                name="soundFile"
+                id="SECOND_SOUND_FILE"
+                accept="audio/*"
+              />
+              <input
+                type="number"
+                name="THIRD_SOUND_UP"
+                id="THIRD_SOUND_UP"
+              />이상
+              <input
+                type="number"
+                name="THIRD_SOUND_DOWN"
+                id="THIRD_SOUND_DOWN"
+              />이하
+              <input
+                type="file"
+                name="soundFile"
+                id="THIRD_SOUND_FILE"
+                accept="audio/*"
+              />
+              <input type="submit" value="저장" />
+            </form>
           </div>
         </div>
         <div class="tab">
@@ -201,20 +290,60 @@
         </div>
       </div>
       <div id="notiControl">
-        <button id="notiStop" class="saveBtn">알림 STOP</button>
-        <button id="notiResume" class="saveBtn">알림 RESUME</button>
+        <button id="notiStop" class="saveBtn">알림 일시정지</button>
+        <button id="notiResume" class="saveBtn">알림 시작</button>
+      </div>
+      <div id="explorers">
+        <button
+          id="resource"
+          class="saveBtn"
+          onclick="shell.openExternal(process.resourcesPath + '/public')"
+        >
+          리소스 폴더
+        </button>
+        <button id="logsOpen" class="saveBtn">로그 폴더</button>
+        <button
+          id="lists"
+          class="saveBtn"
+          onclick="shell.openExternal(process.resourcesPath + '/list')"
+        >
+          리스트 폴더
+        </button>
+        <button id="result" class="saveBtn">집계로그</button>
+        <button id="totalCount" class="saveBtn">판매수량</button>
       </div>
     </div>
   </body>
   <script>
-    const { ipcRenderer, app } = require('electron')
+    const { ipcRenderer, app, shell } = require('electron')
     const fs = require('fs')
+    const form = document.querySelector('#configInputForm')
+    const ttsForm = document.getElementById('ttsConfigInputForm')
+    const saleEventCheckbox = document.querySelector('#SALE_EVENT_CHECK')
+    const saleEventProductId = document.querySelector('#SALE_EVENT_PRODUCT_ID')
+    let countInterval
+    document.querySelector('#SALE_EVENT_CHECK')
 
-    document.getElementById('test').innerHTML = process.resourcesPath
+    saleEventCheckbox.addEventListener('change', (event) => {
+      event.preventDefault()
+      saleEventProductId.disabled = !event.target.checked
+    })
+    var socket = io.connect('http://localhost:3000')
 
-    var notificationLink = document.querySelector('#notificationLink')
-    var boardLink = document.querySelector('#boardLink')
+    socket.on('connection', async function (reason) {
+      getCount()
+      countInterval = setInterval(getCount, 1000)
+    })
+
+    socket.on('disconnect', function (reason) {
+      clearInterval(countInterval)
+    })
+
     window.onload = () => {
+      const notificationLink = document.querySelector('#notificationLink')
+      const boardLink = document.querySelector('#boardLink')
+      getApiConfig()
+      // 레이아웃 주소 가져오기
       ipcRenderer.on('ipAddress', (evt, ipAdress) => {
         notificationLink.href = `http://${ipAdress}:3000/notification`
         boardLink.href = `http://${ipAdress}:3000/board`
@@ -222,13 +351,92 @@
         notificationLink.innerText = `http://${ipAdress}:3000/notification`
         boardLink.innerText = `http://${ipAdress}:3000/board`
       })
+
+      // 레이아웃 주소 가져오기
+      ipcRenderer.on('userData', (evt, path) => {
+        console.log('userData', path)
+        document
+          .querySelector('#logsOpen')
+          .addEventListener('click', function (event) {
+            event.preventDefault()
+            shell.openExternal(path)
+          })
+      })
+
+      // 레이아웃 주소 가져오기
+      ipcRenderer.on('pointList', (evt, path) => {
+        console.log('pointList', path)
+        document
+          .querySelector('#result')
+          .addEventListener('click', function (event) {
+            event.preventDefault()
+            shell.openExternal(path)
+          })
+      })
     }
 
-    var socket = io.connect('http://localhost:3000')
-    const form = document.querySelector('#configInputForm')
+    // API 설정 가져오기
+    function getApiConfig() {
+      fetch('http://localhost:3000/config')
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector('#CLIENT_ID').value = data.CLIENT_ID
+          document.querySelector('#CLIENT_SECRET').value = data.CLIENT_SECRET
+          document.querySelector('#ACCOUNT_ID').value = data.ACCOUNT_ID
+          document.querySelector('#NICK_OPT').value = data.NICK_OPT
+          document.querySelector('#TEXT_OPT').value = data.TEXT_OPT
+          document.querySelector('#SIZE_OPT').value = data.SIZE_OPT
+          document.querySelector('#BJ_OPT').value = data.BJ_OPT
+          document.querySelector('#POINT_OPT').value = data.POINT_OPT
+          document.getElementById('PRODUCT_ID').value = data.PRODUCT_ID
+          document.getElementById('SHOW_BJ_POINT').checked = data.SHOW_BJ_POINT
+          document.getElementById('SALE_EVENT_CHECK').checked =
+            data.SALE_EVENT_CHECK
+          document.getElementById('SALE_EVENT_PRODUCT_ID').value =
+            data.SALE_EVENT_PRODUCT_ID
+          document.getElementById('SALE_EVENT_PRODUCT_ID').disabled =
+            !data.SALE_EVENT_CHECK
+        })
+    }
+
+    // 알림 멈춤 재개 토글
+    const notiStop = document.querySelector('#notiStop')
+    const notiResume = document.querySelector('#notiResume')
+
+    notiStop.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiStop.style.display = 'none'
+      notiResume.style.display = 'block'
+      await fetch('http://localhost:3000/noti/stop')
+    })
+
+    notiResume.addEventListener('click', async (event) => {
+      event.preventDefault()
+      notiResume.style.display = 'none'
+      notiStop.style.display = 'block'
+      await fetch('http://localhost:3000/noti/resume')
+    })
+
+    // 토스트 관련
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-right',
+      iconColor: 'white',
+      backgroundColor: '',
+      customClass: {
+        popup: 'colored-toast',
+      },
+      showConfirmButton: false,
+      timer: 3000,
+    })
+
+    document.getElementById('test').innerHTML = process.resourcesPath // 디버그용
+
+    // API 설정 서브밋 액션
     form.addEventListener('submit', async (event) => {
       event.preventDefault()
-
+      if (saleEventCheckbox.checked) {
+      }
       let response = await fetch('http://localhost:3000/config', {
         method: 'POST',
         headers: {
@@ -249,44 +457,80 @@
           BJ_OPT: document.getElementById('BJ_OPT').value,
           POINT_OPT: document.getElementById('POINT_OPT').value,
           SHOW_BJ_POINT: document.getElementById('SHOW_BJ_POINT').checked,
+          SALE_EVENT_CHECK: document.getElementById('SALE_EVENT_CHECK').checked,
+          SALE_EVENT_PRODUCT_ID: saleEventCheckbox.checked
+            ? document.getElementById('SALE_EVENT_PRODUCT_ID').value
+            : null,
         }),
       })
 
-      let result = await response.json()
-
-      alert(result.message)
+      if (response) {
+        await Toast.fire({
+          icon: 'success',
+          title: 'Success',
+        })
+      } else {
+        await Toast.fire({
+          icon: 'false',
+          title: 'false',
+        })
+      }
     })
 
-    fetch('http://localhost:3000/config')
-      .then((response) => response.json())
-      .then((data) => {
-        document.querySelector('#CLIENT_ID').value = data.CLIENT_ID
-        document.querySelector('#CLIENT_SECRET').value = data.CLIENT_SECRET
-        document.querySelector('#ACCOUNT_ID').value = data.ACCOUNT_ID
-        document.querySelector('#NICK_OPT').value = data.NICK_OPT
-        document.querySelector('#TEXT_OPT').value = data.TEXT_OPT
-        document.querySelector('#SIZE_OPT').value = data.SIZE_OPT
-        document.querySelector('#BJ_OPT').value = data.BJ_OPT
-        document.querySelector('#POINT_OPT').value = data.POINT_OPT
-        document.getElementById('PRODUCT_ID').value = data.PRODUCT_ID
-        document.getElementById('SHOW_BJ_POINT').checked = data.SHOW_BJ_POINT
+    ttsForm.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      const formData = new FormData()
+      const numInput = ttsForm.querySelectorAll('input[type="number"]')
+      const fileInput = ttsForm.querySelectorAll('input[type="file"]')
+      console.log(numInput)
+      for (var i = 0; i < numInput.length; i++) {
+        if (numInput[i].value) {
+          formData.append(numInput[i].name, numInput[i].value)
+        } else {
+          formData.append(numInput[i].name, '')
+        }
+      }
+
+      for (var j = 0; j < fileInput.length; j++) {
+        if (fileInput[j].files.length > 0) {
+          formData.append(fileInput[j].id, fileInput[j].files[0].name)
+          formData.append(
+            fileInput[j].name,
+            fileInput[j].files[0],
+            fileInput[j].files[0]['name']
+          )
+        } else {
+          formData.append(fileInput[j].name, '')
+        }
+      }
+
+      let response = await fetch('http://localhost:3000/config/tts', {
+        method: 'POST',
+        headers: {},
+        body: formData,
       })
 
-    var notiStop = document.querySelector('#notiStop')
-    var notiResume = document.querySelector('#notiResume')
-
-    notiStop.addEventListener('click', async (event) => {
-      event.preventDefault()
-      notiStop.style.display = 'none'
-      notiResume.style.display = 'block'
-      await fetch('http://localhost:3000/noti/stop')
+      if (response) {
+        await Toast.fire({
+          icon: 'success',
+          title: 'Success',
+        })
+      } else {
+        await Toast.fire({
+          icon: 'false',
+          title: 'false',
+        })
+      }
     })
 
-    notiResume.addEventListener('click', async (event) => {
-      event.preventDefault()
-      notiResume.style.display = 'none'
-      notiStop.style.display = 'block'
-      await fetch('http://localhost:3000/noti/resume')
-    })
+    async function getCount() {
+      await fetch('http://localhost:3000/order/counter')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)
+          document.querySelector('#preCount').innerText = data.present
+          document.querySelector('#totalCount').innerText = data.total
+        })
+    }
   </script>
 </html>

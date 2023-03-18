@@ -3,6 +3,7 @@ module.exports = () => {
   const fs = require('fs')
   const log = require('electron-log')
   const basicAPIconfig = require('./APIconfig.json')
+  const basicTTSconfig = require('./ttsConfig.json')
   const { dateFormat, hoursAgo } = require('./time')
   var appResourcePath = process.resourcesPath
   var check = {
@@ -36,7 +37,7 @@ module.exports = () => {
   } finally {
     fs.writeFile(
       appResourcePath + '/ttsConfig.json',
-      JSON.stringify(basicAPIconfig),
+      JSON.stringify(basicTTSconfig),
       () => {
         check.ttsConfigFile = appResourcePath + '/ttsConfig.json'
       }
@@ -53,6 +54,7 @@ module.exports = () => {
       check.listFolder = appResourcePath + '/list'
     })
   }
+
   //   check list file
   try {
     fs.readFileSync(
@@ -60,7 +62,6 @@ module.exports = () => {
     )
   } catch {
     log.info(`file writing .... ${dateFormat(hoursAgo(6))}_list.json`)
-  } finally {
     fs.writeFile(
       appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_list.json`,
       '[]',
@@ -78,7 +79,6 @@ module.exports = () => {
     )
   } catch {
     log.info(`file writing .... ${dateFormat(hoursAgo(6))}_pointList.json`)
-  } finally {
     fs.writeFile(
       appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pointList.json`,
       '[]',
@@ -90,4 +90,23 @@ module.exports = () => {
       }
     )
   }
+
+  //   present order list file
+  /* try {
+    fs.readFileSync(
+      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pre_list.json`
+    )
+  } catch {
+    log.info(`file writing .... ${dateFormat(hoursAgo(6))}_pre_list.json`)
+    fs.writeFile(
+      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pre_list.json`,
+      '[]',
+      () => {
+        check.listFile =
+          appResourcePath +
+          '/list' +
+          `/${dateFormat(hoursAgo(6))}_pre_list.json`
+      }
+    )
+  } */
 }

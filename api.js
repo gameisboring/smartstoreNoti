@@ -1,4 +1,5 @@
-const electron = require('electron')
+'use strict'
+
 const fs = require('fs').promises
 const axios = require('axios').default
 const { io } = require('./server')
@@ -7,11 +8,6 @@ const log = require('electron-log')
 const { createhashedSign } = require('./hash')
 const { dateFormat, hoursAgo } = require('./time')
 
-const elApp = electron.app
-// 2023-01-01_list.json
-let listFileName = `/${dateFormat(hoursAgo(6))}_list.json`
-// 2023-01-01_pointList.json
-let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
 //  appdata/roaming/projectName
 let listFileUrl = process.resourcesPath + '/list'
 
@@ -21,7 +17,9 @@ module.exports = class ApiControls {
    * @returns (String) access_token
    */
   async getOauthTokenToAxios() {
-    const API = await this.getAPIconfig()
+    const API = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
     /* log.info('req params', {
       client_id: API.CLIENT_ID,
       timestamp: new Date().getTime() - 3000,
@@ -62,16 +60,34 @@ module.exports = class ApiControls {
     })
   }
 
+  async addToPointList(mappedData) {
+    // 2023-01-01_pointList.json
+    // 리스트 파일로 저장
+  }
+
   /**
    * Compare to Existing Order List
    */
   async compareExOrderList(mappedData) {
+    const API = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
+    // 2023-01-01_list.json
+    let listFileName = `/${dateFormat(hoursAgo(6))}_list.json`
+    let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
     // 새로운 주문 넣을 빈 배열
-    let newOrders = []
+    let notiOrders = []
+
     // 기존에 작성되어있는 Array 타입 JSON 파일
     let orderedList = JSON.parse(
       await fs.readFile(listFileUrl + listFileName, 'utf-8')
     )
+    let pointList = JSON.parse(
+      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
+    )
+
+    // 클래스 객체
+    let apiControls = new ApiControls()
 
     // 파라미터로 넘어온 데이터 순회하며 중복조회
     for (var i in mappedData) {
@@ -82,65 +98,89 @@ module.exports = class ApiControls {
 
       // 이전 기록과 비교해서 겹치는 게 없을 때(필터링 된 데이터 없음)
       if (result.length == 0) {
-        log.info(
-          `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${mappedData[i].productName} | 수량: ${mappedData[i].quantity}ea | 구매자: ${mappedData[i].nick} | BJ포인트: ${mappedData[i].bj}${mappedData[i].point}`
-        )
-        // 포인트 리스트에 추가
-        this.addToPointList(mappedData[i])
+        if (API.SALE_EVENT_CHECK) {
+          // 판매 이벤트 진행중
+          if (mappedData[i].productId == API.SALE_EVENT_PRODUCT_ID) {
+            // 판매 이벤트 진행중 & 상품 코드 일치
+            log.info(
+              `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${
+                mappedData[i].productName
+              } | 수량: ${mappedData[i].quantity}ea | 구매자: ${
+                mappedData[i].nick
+              }${mappedData[i].bj ? ' | BJ포인트: ' + mappedData[i].bj : ''}${
+                mappedData[i].point ? mappedData[i].point : ''
+              } | 판매 이벤트 참여 : 참여`
+            )
+            orderedList.push({
+              no: orderedList.length,
+              productOrderId: mappedData[i].productOrderId,
+              productId: mappedData[i].productId,
+              presentSaleEvent: true,
+            })
+            // 구매 알림리스트에 추가
+            notiOrders.push(mappedData[i])
+          } else {
+            // 판매 이벤트 진행중 & 상품 코드 불일치
+            log.info(
+              `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${
+                mappedData[i].productName
+              } | 수량: ${mappedData[i].quantity}ea | 구매자: ${
+                mappedData[i].nick
+              }${mappedData[i].bj ? ' | BJ포인트: ' + mappedData[i].bj : ''}${
+                mappedData[i].point ? mappedData[i].point : ''
+              } | 판매 이벤트 참여 : 참여 안함`
+            )
 
-        // 불러온 기존데이터 리스트에 추가
-        orderedList.push({
-          no: orderedList.length,
+            orderedList.push({
+              no: orderedList.length,
+              productOrderId: mappedData[i].productOrderId,
+              productId: mappedData[i].productId,
+              presentSaleEvent: false,
+            })
+          }
+        } else {
+          orderedList.push({
+            no: orderedList.length,
+            productOrderId: mappedData[i].productOrderId,
+            productId: mappedData[i].productId,
+            presentSaleEvent: false,
+          })
+          // 판매 이벤트 진행 안함
+          log.info(
+            `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${
+              mappedData[i].productName
+            } | 수량: ${mappedData[i].quantity}ea | 구매자: ${
+              mappedData[i].nick
+            }${mappedData[i].bj ? ' | BJ포인트: ' + mappedData[i].bj : ''}${
+              mappedData[i].point ? mappedData[i].point : ''
+            } | 판매 이벤트 참여 : 참여 안함`
+          )
+        }
+
+        pointList.push({
+          no: pointList.length,
+          nick: mappedData[i].nick,
           productOrderId: mappedData[i].productOrderId,
+          productId: mappedData[i].productId,
+          bj: mappedData[i].bj,
+          point: mappedData[i].point,
+          orderDate: mappedData[i].date,
+          quantity: mappedData[i].quantity,
         })
-
-        // 리스트 파일로 저장
-        await fs.writeFile(
-          listFileUrl + listFileName,
-          JSON.stringify(orderedList)
-        )
-
-        // 새로운 주문목록에 추가
-        newOrders.push(mappedData[i])
       }
     }
+
+    // 리스트 파일로 저장
+    await fs.writeFile(listFileUrl + listFileName, JSON.stringify(orderedList))
+    await fs.writeFile(
+      listFileUrl + pointListFileName,
+      JSON.stringify(pointList)
+    )
     // 순회 마치고 새롭게 추가된 데이터 반환
-    io.emit('orderList', newOrders)
+    io.emit('orderList', notiOrders)
 
-    return mappedData // return true
-  }
-
-  async addToPointList(mappedData) {
-    let pointList = JSON.parse(
-      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
-    )
-    let apiControls = new ApiControls()
-
-    var pointResult = pointList.filter(
-      // productOrderId 중복이면 필터링
-      (order) => order.productOrderId == mappedData.productOrderId
-    )
-
-    if (pointResult.length == 0) {
-      // 불러온 포인트 리스트에 데이터 추가
-      pointList.push({
-        no: pointList.length,
-        nick: mappedData.nick,
-        productOrderId: mappedData.productOrderId,
-        bj: mappedData.bj,
-        point: mappedData.point,
-        orderDate: mappedData.date,
-        quantity: mappedData.quantity,
-      })
-
-      // 리스트 파일로 저장
-      await fs.writeFile(
-        listFileUrl + pointListFileName,
-        JSON.stringify(pointList)
-      )
-
-      io.emit('scoreboard', await apiControls.scoreBoardToUsableData())
-    }
+    // return notiOrders
+    return true
   }
 
   /**
@@ -164,7 +204,9 @@ module.exports = class ApiControls {
         },
         params: {
           // 10분 전
-          lastChangedFrom: new Date(new Date().getTime() - 600000),
+          // lastChangedFrom: new Date(new Date().getTime() - 600000),
+          lastChangedFrom: new Date(new Date().toDateString()),
+          // lastChangedFrom: new Date('2023-03-17'),
           lastChangedType: 'PAYED',
         },
       })
@@ -192,34 +234,50 @@ module.exports = class ApiControls {
   async getOrderList() {
     /* return [
       {
-        nick: '테스트트트 ',
-        text: '메세지',
-        size: '240 ',
-        bj: '시원 ',
-        quantity: '1',
+        productOrderId: '2023031660411041',
+        quantity: 1,
+        nick: '홈플러스',
+        text: '시그니쳐 물티슈 WET WIPES',
+        size: '260',
+        bj: 'A4 용지',
         point: '플러스',
-        productName: ' 뭉탱이 케인 슬리퍼 조합형',
+        productName: '뭉탱이 케인 슬리퍼',
+        date: '2023-03-16T15:53:27.0+09:00',
       },
       {
-        nick: '테스트트트 ',
-        text: '메가커피',
-        size: '240 ',
-        bj: '시원 ',
-        quantity: '5',
-        point: '플러스',
+        productOrderId: '2023031660484041',
+        quantity: 1,
+        nick: '시시호시',
+        text: '벡셀 건전지',
+        size: '230',
+        bj: '볼펜',
+        point: '마이너스',
         productName: ' 뭉탱이 케인 슬리퍼 조합형',
+        date: '2023-03-16T15:55:27.0+09:00',
       },
       {
-        nick: '테스트트트 ',
-        text: '빽다방',
-        size: '240 ',
-        bj: '시원 ',
-        quantity: '5',
+        productOrderId: '2023031663337591',
+        quantity: 1,
+        nick: 'ABC마트 코리아',
+        text: '이용해 주셔서 감사합니다.',
+        size: '240',
+        bj: '물티슈',
         point: '플러스',
         productName: ' 뭉탱이 케인 슬리퍼 조합형',
+        date: '2023-03-16T17:20:40.0+09:00',
       },
     ] */
-    const API = await this.getAPIconfig()
+
+    const API = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
+    const RegexObj = {
+      nick: new RegExp(`(?<=${API.NICK_OPT}: )(.*?)(?= \/)`),
+      text: new RegExp(`(?<=${API.TEXT_OPT}: )(.*?)(?= \/)`),
+      size: new RegExp(`(?<=${API.SIZE_OPT}: )(.*?)(?= \/)`),
+      bj: new RegExp(`(?<=${API.BJ_OPT}: )(.*?)(?= \/)`),
+      point: new RegExp(`(?<=${API.POINT_OPT}: )(.*?)(?= \/)`),
+    }
     const orderList = await this.getChangeList()
     const check = this.compareExOrderList
     if (orderList.length == 0) {
@@ -244,12 +302,12 @@ module.exports = class ApiControls {
           productOrderIds: orderList,
         },
       })
-        .then((response) => {
+        .then(function (response) {
           var orders
 
-          // if checked show bj and point
+          // BJ 점수 표시(발주확인건 집계) 체크여부
           if (API.SHOW_BJ_POINT) {
-            orders = response.data.data.filter((productOrder) => {
+            orders = response.data.data.filter(function (productOrder) {
               for (var i in API.PRODUCT_ID) {
                 if (
                   productOrder.productOrder.productId == API.PRODUCT_ID[i] &&
@@ -260,8 +318,35 @@ module.exports = class ApiControls {
               }
               return false
             })
+
+            orders = orders.map(function (productOrder) {
+              const options = productOrder.productOrder.productOption + ' /'
+              return {
+                productOrderId: productOrder.productOrder.productOrderId,
+                productId: productOrder.productOrder.productId,
+                quantity: productOrder.productOrder.quantity,
+                nick: options.match(RegexObj.nick)
+                  ? options.match(RegexObj.nick)[0]
+                  : '',
+                text: options.match(RegexObj.text)
+                  ? options.match(RegexObj.text)[0]
+                  : '',
+                size: options.match(RegexObj.size)
+                  ? options.match(RegexObj.size)[0]
+                  : '',
+                bj: options.match(RegexObj.bj)
+                  ? options.match(RegexObj.bj)[0]
+                  : '',
+                plus: options.match(RegexObj.point)
+                  ? options.match(RegexObj.point)[0]
+                  : '',
+                productName:
+                  productOrder.productOrder.productName.split(']')[1],
+                date: productOrder.order.paymentDate,
+              }
+            })
           } else {
-            orders = response.data.data.filter((productOrder) => {
+            orders = response.data.data.filter(function (productOrder) {
               for (var i in API.PRODUCT_ID) {
                 if (productOrder.productOrder.productId == API.PRODUCT_ID[i]) {
                   return true
@@ -269,64 +354,86 @@ module.exports = class ApiControls {
               }
               return false
             })
+
+            orders = orders.map(function (productOrder) {
+              const options = productOrder.productOrder.productOption + ' /'
+              return {
+                productOrderId: productOrder.productOrder.productOrderId,
+                productId: productOrder.productOrder.productId,
+                quantity: productOrder.productOrder.quantity,
+                nick: options.match(RegexObj.nick)
+                  ? options.match(RegexObj.nick)[0]
+                  : '',
+                text: options.match(RegexObj.text)
+                  ? options.match(RegexObj.text)[0]
+                  : '',
+                size: options.match(RegexObj.size)
+                  ? options.match(RegexObj.size)[0]
+                  : '',
+                productName:
+                  productOrder.productOrder.productName.split(']')[1],
+                date: productOrder.order.paymentDate,
+              }
+            })
           }
-
-          orders.map((productOrder) => {
-            const options = productOrder.productOrder.productOption.split('/')
-            return {
-              productOrderId: productOrder.productOrder.productOrderId,
-              quantity: productOrder.productOrder.quantity,
-              nick: options[0].split(API.NICK_OPT + ': ')[1],
-              text: options[1].split(API.TEXT_OPT + ': ')[1],
-              size: options[2].split(API.SIZE_OPT + ': ')[1],
-              bj: options[3].split(API.BJ_OPT + ': ')[1],
-              point: options[4].split(API.POINT_OPT + ': ')[1],
-              productName: productOrder.productOrder.productName.split(']')[1],
-              date: productOrder.order.paymentDate,
-            }
-          })
-          // 발주한 상품 상세 데이터에는 'placeOrderDate'라는 KEY 가 존재함
-          /*  */
-          /**
-            조회한 데이터 파싱
-            productOrder.productOrder.productOption
-            옵션으로 적은 값 포함되어있음 구분자는 '/'
-            */
-
-          resolve(check(placedOrder))
+          resolve(check(orders))
         })
         .catch(function (error) {
-          console.error('getChangeList', error.response.data)
+          console.error('getOrderList', error.response.data)
           resolve(error)
         })
     })
   }
 
-  async getScroeList() {
-    let scoreResult = new Object({})
-    scoreResult.total = 0
+  async getScoreList() {
+    let scoreResult = new Object({ total: 0 })
+    let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
     let pointList = JSON.parse(
       await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
     )
     for (var i in pointList) {
-      if (!scoreResult.hasOwnProperty(pointList[i].bj)) {
-        scoreResult[pointList[i].bj] = { plus: 0, minus: 0, quantity: 0 }
-      }
+      if (pointList[i].hasOwnProperty('bj')) {
+        if (!scoreResult.hasOwnProperty(pointList[i].bj)) {
+          scoreResult[pointList[i].bj] = { plus: 0, minus: 0, quantity: 0 }
+        }
 
-      if (pointList[i].point == '플러스') {
-        scoreResult[pointList[i].bj].plus++
-      } else if (pointList[i].point == '마이너스') {
-        scoreResult[pointList[i].bj].minus++
-      }
+        if (pointList[i].point == '플러스') {
+          scoreResult[pointList[i].bj].plus++
+        } else if (pointList[i].point == '마이너스') {
+          scoreResult[pointList[i].bj].minus++
+        }
 
-      scoreResult[pointList[i].bj].quantity += pointList[i].quantity
-      scoreResult.total += pointList[i].quantity
+        scoreResult[pointList[i].bj].quantity += pointList[i].quantity
+        scoreResult.total += pointList[i].quantity
+      }
     }
     return scoreResult
   }
 
+  async getCounter() {
+    let counterObj = new Object({ total: 0, present: 0 })
+    const API = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
+    let orderList = JSON.parse(
+      await fs.readFile(
+        listFileUrl + `/${dateFormat(hoursAgo(6))}_list.json`,
+        'utf-8'
+      )
+    )
+    counterObj.total = orderList.length
+    orderList.forEach((element) => {
+      if (API.SALE_EVENT_PRODUCT_ID) {
+        if (API.SALE_EVENT_PRODUCT_ID == element.productId) {
+          counterObj.present++
+        }
+      }
+    })
+    return counterObj
+  }
+
   async scoreBoardToUsableData() {
-    let scoreboard = await this.getScroeList()
+    let scoreboard = await this.getScoreList()
     // 주문건수만 먹고 버리기
     let total = Number(scoreboard.total)
     delete scoreboard.total
@@ -334,22 +441,64 @@ module.exports = class ApiControls {
     let result = new Array()
 
     for (var i in Object.keys(scoreboard)) {
+      const score =
+        scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
+        scoreboard[Object.keys(scoreboard)[i]].minus * 100
+      const coutribute = scoreboard[Object.keys(scoreboard)[i]].quantity * 100
       var newObj = {
         name: Object.keys(scoreboard)[i],
-        score:
-          scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
-          scoreboard[Object.keys(scoreboard)[i]].minus * 100,
-        contribute: scoreboard[Object.keys(scoreboard)[i]].quantity * 100,
+        score: score,
+        contribute: coutribute,
+        total: score + coutribute,
       }
       result.push(newObj)
     }
-    result.sort((a, b) => b.score - a.score)
+
+    result.sort(function (a, b) {
+      if (a.score > b.score) return -1
+      if (a.score < b.score) return 1
+      return 0
+    })
+
+    for (var i in result) {
+      result[i].rank = ++i
+    }
+
     return { result, total }
   }
 
-  async getAPIconfig() {
-    return JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
-    )
+  async scoreBoardResult() {
+    let scoreboard = await this.getScoreList()
+    // 주문건수만 먹고 버리기
+    let total = Number(scoreboard.total)
+    delete scoreboard.total
+
+    let result = new Array()
+
+    for (var i in Object.keys(scoreboard)) {
+      const score =
+        scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
+        scoreboard[Object.keys(scoreboard)[i]].minus * 100
+      const coutribute = scoreboard[Object.keys(scoreboard)[i]].quantity * 100
+      var newObj = {
+        이름: Object.keys(scoreboard)[i],
+        점수: score,
+        기여도: coutribute,
+        종합점수: score + coutribute,
+      }
+      result.push(newObj)
+    }
+
+    result.sort(function (a, b) {
+      if (a.score > b.score) return -1
+      if (a.score < b.score) return 1
+      return 0
+    })
+
+    for (var i in result) {
+      result[i].rank = ++i
+    }
+
+    return { 결과: result, '총 판매수량': total }
   }
 }

@@ -5,8 +5,56 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body></body>
-  <script></script>
+  <script>
+    let timerId = setTimeout(function tick() {
+      console.log('start')
+      var notiSound = new Audio()
+      var notiTextToSpeach = new Audio('http://nstream.kr:1322/' + '테스트')
+
+      notiSound.src = `sounds/first.mp3`
+
+      notiSound.load()
+      notiTextToSpeach.load()
+
+      notiSound.onloadedmetadata = function () {
+        /* notiSound.play()
+        setTimeoutID = setTimeout(() => {
+          notiTextToSpeach.play()
+          clearTimeout(setTimeoutID)
+        }, 2000) */
+
+        Swal.fire({
+          title: `<span class="nick">메가커피</span>님
+      <span class="productName">'아이스아메리카노'</span> <span class="quantity">15</span>개
+      구매 감사합니다
+      <span class="point">선현규 플러스</span>`,
+          html: `<span class="msgText">안녕히 계세요</span>`,
+          timer: 5000,
+          // timerProgressBar: true,
+          imageUrl: '/noti/image',
+          imageHeight: 300,
+          imageAlt: 'A image',
+          color: '#716add',
+          showConfirmButton: false,
+          background: 'transparent',
+          backdrop: `rgba(0,0,0,0.0)`,
+          didOpen: async () => {
+            notiSound.play()
+            setTimeoutID = setTimeout(() => {
+              notiTextToSpeach.play()
+              clearTimeout(setTimeoutID)
+            }, 2000)
+          },
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+          }
+        })
+      }
+      timerId = setTimeout(tick, 3000) /* ...code */
+    }, 0)
+  </script>
 </html>
