@@ -85,7 +85,6 @@ module.exports = class ApiControls {
     let pointList = JSON.parse(
       await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
     )
-
     // 클래스 객체
     let apiControls = new ApiControls()
 
@@ -145,6 +144,8 @@ module.exports = class ApiControls {
             productId: mappedData[i].productId,
             presentSaleEvent: false,
           })
+
+          notiOrders.push(mappedData[i])
           // 판매 이벤트 진행 안함
           log.info(
             `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${
@@ -203,10 +204,9 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          // 10분 전
-          // lastChangedFrom: new Date(new Date().getTime() - 600000),
-          lastChangedFrom: new Date(new Date().toDateString()),
-          // lastChangedFrom: new Date('2023-03-17'),
+          // 10초 전
+          lastChangedFrom: new Date(new Date().getTime() - 10000),
+          // lastChangedFrom: new Date(new Date().toDateString()),
           lastChangedType: 'PAYED',
         },
       })
@@ -222,7 +222,7 @@ module.exports = class ApiControls {
           }
         })
         .catch(function (error) {
-          console.error('getChangeList', error.response)
+          log.error('getChangeList', error.response)
           resolve(false)
         })
     })
@@ -232,42 +232,6 @@ module.exports = class ApiControls {
    * get Order List
    */
   async getOrderList() {
-    /* return [
-      {
-        productOrderId: '2023031660411041',
-        quantity: 1,
-        nick: '홈플러스',
-        text: '시그니쳐 물티슈 WET WIPES',
-        size: '260',
-        bj: 'A4 용지',
-        point: '플러스',
-        productName: '뭉탱이 케인 슬리퍼',
-        date: '2023-03-16T15:53:27.0+09:00',
-      },
-      {
-        productOrderId: '2023031660484041',
-        quantity: 1,
-        nick: '시시호시',
-        text: '벡셀 건전지',
-        size: '230',
-        bj: '볼펜',
-        point: '마이너스',
-        productName: ' 뭉탱이 케인 슬리퍼 조합형',
-        date: '2023-03-16T15:55:27.0+09:00',
-      },
-      {
-        productOrderId: '2023031663337591',
-        quantity: 1,
-        nick: 'ABC마트 코리아',
-        text: '이용해 주셔서 감사합니다.',
-        size: '240',
-        bj: '물티슈',
-        point: '플러스',
-        productName: ' 뭉탱이 케인 슬리퍼 조합형',
-        date: '2023-03-16T17:20:40.0+09:00',
-      },
-    ] */
-
     const API = await JSON.parse(
       await fs.readFile(process.resourcesPath + '/APIconfig.json')
     )
@@ -304,24 +268,26 @@ module.exports = class ApiControls {
       })
         .then(function (response) {
           var orders
-
           // BJ 점수 표시(발주확인건 집계) 체크여부
           if (API.SHOW_BJ_POINT) {
             orders = response.data.data.filter(function (productOrder) {
               for (var i in API.PRODUCT_ID) {
-                if (
-                  productOrder.productOrder.productId == API.PRODUCT_ID[i] &&
-                  productOrder.productOrder.hasOwnProperty('placeOrderDate')
-                ) {
-                  return true
+                if (productOrder.productOrder.productId == API.PRODUCT_ID[i]) {
+                  if (
+                    productOrder.productOrder.hasOwnProperty('placeOrderDate')
+                  ) {
+                    return true
+                  }
                 }
               }
-              return false
+              {
+                return false
+              }
             })
 
             orders = orders.map(function (productOrder) {
               const options = productOrder.productOrder.productOption + ' /'
-              return {
+              var returnVal = {
                 productOrderId: productOrder.productOrder.productOrderId,
                 productId: productOrder.productOrder.productId,
                 quantity: productOrder.productOrder.quantity,
@@ -337,13 +303,14 @@ module.exports = class ApiControls {
                 bj: options.match(RegexObj.bj)
                   ? options.match(RegexObj.bj)[0]
                   : '',
-                plus: options.match(RegexObj.point)
+                point: options.match(RegexObj.point)
                   ? options.match(RegexObj.point)[0]
                   : '',
                 productName:
                   productOrder.productOrder.productName.split(']')[1],
                 date: productOrder.order.paymentDate,
               }
+              return returnVal
             })
           } else {
             orders = response.data.data.filter(function (productOrder) {
@@ -354,7 +321,6 @@ module.exports = class ApiControls {
               }
               return false
             })
-
             orders = orders.map(function (productOrder) {
               const options = productOrder.productOrder.productOption + ' /'
               return {
@@ -379,7 +345,7 @@ module.exports = class ApiControls {
           resolve(check(orders))
         })
         .catch(function (error) {
-          console.error('getOrderList', error.response.data)
+          log.error('getOrderList', error.response.data)
           resolve(error)
         })
     })
@@ -410,8 +376,8 @@ module.exports = class ApiControls {
     return scoreResult
   }
 
-  async getCounter() {
-    let counterObj = new Object({ total: 0, present: 0 })
+  async getCountForAdmin() {
+    let counterResult = new Object({ TotalOrders: 0 })
     const API = await JSON.parse(
       await fs.readFile(process.resourcesPath + '/APIconfig.json')
     )
@@ -421,11 +387,38 @@ module.exports = class ApiControls {
         'utf-8'
       )
     )
-    counterObj.total = orderList.length
+
+    orderList.forEach((element) => {
+      counterResult.TotalOrders++
+      if (!counterResult.hasOwnProperty(element.productId)) {
+        counterResult[element.productId] = { TotalCount: 0, PreCount: 0 }
+      }
+      counterResult[element.productId].TotalCount++
+      if (API.SALE_EVENT_CHECK) {
+        if (API.SALE_EVENT_PRODUCT_ID == element.productId) {
+          counterResult[element.productId].PreCount++
+        }
+      }
+    })
+    return counterResult
+  }
+
+  async getCountForClient() {
+    let counterObj = new Object({ TotalCount: 0, PreCount: 0 })
+    const API = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
+    let orderList = JSON.parse(
+      await fs.readFile(
+        listFileUrl + `/${dateFormat(hoursAgo(6))}_list.json`,
+        'utf-8'
+      )
+    )
+    counterObj.TotalCount = orderList.length
     orderList.forEach((element) => {
       if (API.SALE_EVENT_PRODUCT_ID) {
         if (API.SALE_EVENT_PRODUCT_ID == element.productId) {
-          counterObj.present++
+          counterObj.PreCount++
         }
       }
     })
@@ -451,12 +444,15 @@ module.exports = class ApiControls {
         contribute: coutribute,
         total: score + coutribute,
       }
+
       result.push(newObj)
     }
 
     result.sort(function (a, b) {
       if (a.score > b.score) return -1
       if (a.score < b.score) return 1
+      if (a.contribute > b.contribute) return -1
+      if (a.contribute < b.contribute) return 1
       return 0
     })
 
@@ -490,8 +486,10 @@ module.exports = class ApiControls {
     }
 
     result.sort(function (a, b) {
-      if (a.score > b.score) return -1
-      if (a.score < b.score) return 1
+      if (a.점수 > b.점수) return -1
+      if (a.점수 < b.점수) return 1
+      if (a.기여도 > b.기여도) return -1
+      if (a.기여도 < b.기여도) return 1
       return 0
     })
 

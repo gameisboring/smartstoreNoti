@@ -29,27 +29,16 @@ socket.on('connection', (reason) => {
 
 function addListBar(data, rank) {
   var barImageFileName
-  switch (rank) {
-    case 1: {
-      barImageFileName = 1
-      break
-    }
-    case 2: {
-      barImageFileName = 2
-      break
-    }
-    case 3: {
-      barImageFileName = 3
-      break
-    }
-    case rank > 7: {
-      barImageFileName = 'low'
-      break
-    }
-
-    default:
-      barImageFileName = 'normal'
-      break
+  if (rank == 1) {
+    barImageFileName = 1
+  } else if (rank == 2) {
+    barImageFileName = 2
+  } else if (rank == 3) {
+    barImageFileName = 3
+  } else if (rank > 7) {
+    barImageFileName = 'low'
+  } else {
+    barImageFileName = 'normal'
   }
 
   var el = `<div class="bar">

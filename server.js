@@ -17,16 +17,25 @@ const SocketIO = require('socket.io')
 const io = SocketIO(server, { path: '/socket.io' })
 module.exports = { io }
 
-const storage = multer.diskStorage({
+const SoundStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(process.resourcesPath, '/public/sound'))
+    cb(null, path.join(process.resourcesPath, '/public/sounds'))
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname)
   },
 })
+const ImageStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(process.resourcesPath, '/public/images'))
+  },
+  filename: function (req, file, cb) {
+    cb(null, 'noti.png')
+  },
+})
 
-const upload = multer({ storage: storage })
+const SoundUpload = multer({ storage: SoundStorage })
+const ImageUpload = multer({ storage: ImageStorage })
 
 const ApiControls = require('./api')
 // const ttsConfig = require('./ttsConfig')
@@ -69,10 +78,32 @@ app2.get('/order', async function (req, res) {
   res.send(dataList)
 })
 
-app2.get('/order/counter', async function (req, res) {
+app2.get('/order/count', async function (req, res) {
   // log.info(`GET /order/counter`)
-  const count = await api.getCounter()
+  const count = await api.getCountForClient()
   res.json(count)
+})
+
+app2.get('/order/result', async function (req, res) {
+  // log.info(`GET /order/counter`)
+  const count = await api.getCountForAdmin()
+  fs.writeFile(
+    path.join(
+      process.resourcesPath,
+      '/list',
+      dateFormat(hoursAgo(6)) + '_판매수량.json'
+    ),
+    JSON.stringify(count),
+    function () {
+      res.download(
+        path.join(
+          process.resourcesPath,
+          '/list',
+          dateFormat(hoursAgo(6)) + '_판매수량.json'
+        )
+      )
+    }
+  )
 })
 
 app2.get('/scoreboard', async function (req, res) {
@@ -88,7 +119,7 @@ app2.get('/scoreboard/result', async function (req, res) {
     path.join(
       process.resourcesPath,
       '/list',
-      dateFormat(hoursAgo(6)) + '_result.json'
+      dateFormat(hoursAgo(6)) + '_집계결과.json'
     ),
     JSON.stringify(dataList),
     function () {
@@ -96,7 +127,7 @@ app2.get('/scoreboard/result', async function (req, res) {
         path.join(
           process.resourcesPath,
           '/list',
-          dateFormat(hoursAgo(6)) + '_result.json'
+          dateFormat(hoursAgo(6)) + '_집계결과.json'
         )
       )
     }
@@ -110,7 +141,6 @@ app2.get('/scoreboard/get', async function (req, res) {
 
 /* 설정 가져오기 */
 app2.get('/config', function (req, res) {
-  log.info(`GET /config`)
   if (!fs.existsSync(process.resourcesPath + '/APIconfig.json')) {
     log.info(`please write file "APIconfig.json"`)
   } else {
@@ -122,7 +152,6 @@ app2.get('/config', function (req, res) {
 
 /* TTS 설정 가져오기 */
 app2.get('/config/tts', function (req, res) {
-  log.info(`GET /config/tts`)
   if (!fs.existsSync(process.resourcesPath + '/ttsConfig.json')) {
     log.info(`please write file "ttsConfig.json"`)
   } else {
@@ -141,7 +170,7 @@ app2.post('/config', function (req, res) {
       JSON.stringify(req.body),
       'utf-8',
       () => {
-        console.log(JSON.stringify(req.body))
+        log.info('API 설정변경', JSON.stringify(req.body))
         res.send(true)
       }
     )
@@ -151,48 +180,59 @@ app2.post('/config', function (req, res) {
 })
 
 // 다중 파일 업로드
-app2.post('/config/tts', upload.array('soundFile'), (req, res, next) => {
+app2.post('/config/tts', SoundUpload.array('soundFile'), (req, res, next) => {
   let obj = JSON.parse(JSON.stringify(req.body))
   if (req.body) {
-    fs.writeFile(
-      process.resourcesPath + '/ttsConfig.json',
-      JSON.stringify(obj),
-      'utf-8',
-      () => {
-        console.log(JSON.stringify(obj))
-        res.status(200).send({
-          message: 'Ok',
-          fileInfo: req.files,
-        })
-      }
-    )
+    try {
+      fs.writeFile(
+        process.resourcesPath + '/ttsConfig.json',
+        JSON.stringify(obj),
+        'utf-8',
+        () => {
+          log.info('알림 설정 변경', JSON.stringify(obj))
+          res.status(200).send({
+            ok: true,
+          })
+        }
+      )
+    } catch (error) {
+      log.error(error)
+      res.status(200).send({
+        ok: false,
+      })
+    }
   }
 })
 
 app2.get('/noti/image', function (req, res) {
   log.info(`GET /noti/image`)
-  if (fs.existsSync(process.resourcesPath + '/noti.png')) {
-    res.sendFile(process.resourcesPath + '/noti.png')
-  } else {
-    res.sendFile(__dirname + '/public/images/handsup.png')
+  if (fs.existsSync(process.resourcesPath + '/public/images/noti.png')) {
+    res.sendFile(process.resourcesPath + '/public/images/noti.png')
   }
 })
 
-// app2.get('/noti/config', async function (req, res) {
-//   log.info(`GET /noti/config`)
-//   res.send(await ttsConfig())
-// })
+app2.post('/noti/image', (req, res, next) => {
+  log.info(`POST /noti/image`)
+  const uploadSingleImage = ImageUpload.single('imageFile')
+  uploadSingleImage(req, res, function (err) {
+    const file = req.file
+    log.info('알림 이미지 변경', file)
+    if (err) {
+      log.error(err)
+      return res.status(400).send({ message: err })
+    }
+    res.status(200).send({ message: 'ok', ok: true })
+  })
+})
 
 app2.get('/noti/stop', function (req, res) {
   log.info(`GET /noti/stop`)
-  console.log('stop')
   io.emit('stop', 'notification stop !!!')
   res.send(true)
 })
 
 app2.get('/noti/resume', function (req, res) {
   log.info(`GET /noti/resume`)
-  console.log('resume')
   io.emit('resume', 'notification resume !!!')
   res.send(true)
 })

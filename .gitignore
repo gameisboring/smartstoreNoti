@@ -6,5 +6,6 @@
 /test
 /key.json
 /tts-api-account.json
-/gac.sh
 config/ApiConfig.json
+example.js
+

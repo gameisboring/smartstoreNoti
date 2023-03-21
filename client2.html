@@ -4,14 +4,37 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>스마트 스토어 구매알리미</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.js"></script>
     <style>
+      ::selection {
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+      }
+      a {
+        text-decoration: none;
+      }
+      a:link {
+        color: white;
+      }
+      a:visited {
+        color: white;
+      }
+      input::-webkit-inner-spin-button {
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+      }
+      span::selection {
+        background-color: transparent;
+        color: white;
+      }
       * {
+        font-family: 'nanum gothic';
         box-sizing: border-box;
       }
 
@@ -21,6 +44,19 @@
         color: #ecf0f1;
         line-height: 24px;
         margin: 0;
+      }
+      legend {
+        padding: 7px 15px;
+        font-size: 24px;
+        font-weight: 700;
+        background: rgb(255, 255, 255);
+        border-radius: 15px;
+        color: rgb(75, 75, 75);
+      }
+
+      fieldset {
+        border: 2px solid rgb(255, 255, 255);
+        border-radius: 15px;
       }
       .wrapper {
         max-width: 50rem;
@@ -32,7 +68,7 @@
         top: 0;
         margin: 0;
         background: #000000;
-        height: 922px;
+        height: 750px;
       }
       .tabs::before,
       .tabs::after {
@@ -53,12 +89,14 @@
         display: block;
         line-height: 2.75em;
         height: 48px;
-        padding: 0 30px;
+        padding: 0 20px;
         background: #000000;
         border-right: 3px solid #ffffff;
         color: #fff;
         cursor: pointer;
         top: 0;
+        font-weight: 700;
+        font-size: 20px;
         transition: all 0.25s;
       }
       .tab-label:hover {
@@ -69,13 +107,14 @@
       .tab-content {
         position: absolute;
         z-index: 1;
-        top: 47px;
+        top: 50px;
         left: 0;
+        width: 100%;
         padding: 30px;
         background: #000000;
         color: #ffffff;
         opacity: 0;
-        height: calc(100% - 48px - 60px - 30px);
+        height: 100%;
         transition: all 0.35s;
       }
       .tab-switch:checked + .tab-label {
@@ -100,16 +139,175 @@
       .colored-toast.swal2-icon-error {
         background-color: #f27474 !important;
       }
-
+      #configInputForm {
+        height: 100%;
+      }
       #ttsConfigInputForm {
+        line-height: 24px;
+      }
+
+      #ttsConfigInputForm .saveBtn {
+        margin-top: 18px;
+      }
+
+      #ttsConfigInputForm .inputGroup {
+        font-size: 17px;
+        line-height: 30px;
+      }
+      .inputGroup {
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
         line-height: 36px;
+        align-items: center;
+      }
+
+      .inputGroup input[type='text'],
+      .inputGroup textarea {
+        background-color: transparent;
+        color: white;
+        border: 0;
+        border-bottom: 2px solid white;
+        font-size: 24px;
+        line-height: 36px;
+        width: 400px;
+        text-align: right;
+      }
+      .inputGroup textarea {
+        background-color: #494949;
+      }
+
+      .inputGroup input[type='text']:focus,
+      .inputGroup textarea:focus {
+        outline: none;
+      }
+
+      .inputGroup input[type='text']:disabled {
+        background-color: gray;
+      }
+
+      .saveBtn {
+        margin-top: 30px;
+        border: 0;
+        font-size: 20px;
+        border-radius: 15px;
+        background-color: #ffffff;
+        padding: 5px 15px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: #000000 solid 3px;
+      }
+
+      .saveBtn:hover {
+        background-color: #000000;
+        color: #fff;
+        cursor: pointer;
+        border: #fff solid 3px;
+      }
+
+      .inputGroup span {
+        flex-grow: 1;
+      }
+
+      input[type='checkbox'] {
+        width: 20px;
+        height: 20px;
+      }
+
+      .inputGroup .shortInput input[type='number'] {
+        width: 50px;
+        font-size: 24px;
+        background-color: transparent;
+        color: white;
+        border: 0;
+        border-bottom: 2px solid white;
+        text-align: center;
+      }
+      .inputGroup .shortInput input[type='number']:focus {
+        outline: none;
+      }
+
+      #notiResume {
+        display: none;
+      }
+
+      #notiControlField {
+        margin-top: 20px;
+      }
+      .count {
+        display: flex;
+        gap: 10px;
+        font-size: 24px;
+        align-items: center;
+        line-height: 50px;
+        justify-content: space-around;
+      }
+
+      .count span {
+        font-weight: 700;
+        background-color: #494949;
+        padding: 5px 20px;
+      }
+
+      #explorers fieldset {
+        margin-top: 20px;
+      }
+
+      #explorers fieldset .saveBtn {
+        margin: 10px 0;
+      }
+
+      .shortInput {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 15px;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+      }
+
+      .shortInput input[type='file'] {
+        width: 170px;
+      }
+
+      .notiCaseInputField {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-evenly;
+      }
+
+      .notiCaseInputField legend {
+        font-size: 16px;
+        line-height: 20px;
+      }
+
+      .notiCaseInputField .caseNumInput {
+        display: flex;
+        width: 250px;
+        justify-content: space-evenly;
+      }
+
+      .notiCaseInputField .fileInput {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .notiImageInputField {
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+      .notiImageInputField .saveBtn {
+        margin: 0;
       }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
   </head>
   <body>
-    <div id="test"></div>
     <div class="wrapper">
       <div class="tabs">
         <div class="tab">
@@ -120,75 +318,253 @@
             checked
             class="tab-switch"
           />
-          <label for="tab-1" class="tab-label">Tab One</label>
+          <label for="tab-1" class="tab-label">API 설정</label>
           <div class="tab-content">
             <form action="" method="post" id="configInputForm">
-              <h1 class="headline">API 설정</h1>
-              <div class="inputGroup">
-                <span>Client ID</span>
-                <input type="text" name="CLIENT_ID" id="CLIENT_ID" />
-              </div>
-              <div class="inputGroup">
-                <span>Client Secret</span>
-                <input type="text" name="CLIENT_SECRET" id="CLIENT_SECRET" />
-              </div>
-              <div class="inputGroup">
-                <span>Account ID</span>
-                <input type="text" name="ACCOUNT_ID" id="ACCOUNT_ID" />
-              </div>
-              <div class="inputGroup">
-                <span>닉네임 옵션이름</span>
-                <input type="text" name="NICK_OPT" id="NICK_OPT" />
-              </div>
-              <div class="inputGroup">
-                <span>메세지 옵션이름</span>
-                <input type="text" name="TEXT_OPT" id="TEXT_OPT" />
-              </div>
-              <div class="inputGroup">
-                <span>사이즈 옵션이름</span>
-                <input type="text" name="SIZE_OPT" id="SIZE_OPT" />
-              </div>
-              <div class="inputGroup">
-                <span>BJ 옵션이름</span>
-                <input type="text" name="BJ_OPT" id="BJ_OPT" />
-              </div>
-              <div class="inputGroup">
-                <span>점수 옵션이름</span>
-                <input type="text" name="POINT_OPT" id="POINT_OPT" />
-              </div>
-              <div class="inputGroup">
-                <span>조회 할 상품 ID</span>
-                <textarea
-                  name="PRODUCT_ID"
-                  id="PRODUCT_ID"
-                  cols="30"
-                  rows="3"
-                ></textarea>
-              </div>
-              <div class="inputGroup">
-                <span>상품 판매 이벤트</span>
-                <input
-                  type="checkbox"
-                  name="SALE_EVENT_CHECK"
-                  id="SALE_EVENT_CHECK"
-                /><span>상품 ID </span
-                ><input
-                  type="text"
-                  name="SALE_EVENT_PRODUCT_ID"
-                  id="SALE_EVENT_PRODUCT_ID"
-                />
-              </div>
-              <div class="inputGroup">
-                <span>BJ, 점수 표시 (발주확인건 집계)</span>
-                <input
-                  type="checkbox"
-                  name="SHOW_BJ_POINT"
-                  id="SHOW_BJ_POINT"
-                />
-              </div>
+              <fieldset>
+                <legend class="headline">API 설정</legend>
+                <div class="inputGroup">
+                  <span>Client ID</span>
+                  <input type="text" name="CLIENT_ID" id="CLIENT_ID" />
+                </div>
+                <div class="inputGroup">
+                  <span>Client Secret</span>
+                  <input type="text" name="CLIENT_SECRET" id="CLIENT_SECRET" />
+                </div>
+                <div class="inputGroup">
+                  <span>Account ID</span>
+                  <input type="text" name="ACCOUNT_ID" id="ACCOUNT_ID" />
+                </div>
+                <div class="inputGroup">
+                  <span>닉네임 옵션이름</span>
+                  <input type="text" name="NICK_OPT" id="NICK_OPT" />
+                </div>
+                <div class="inputGroup">
+                  <span>메세지 옵션이름</span>
+                  <input type="text" name="TEXT_OPT" id="TEXT_OPT" />
+                </div>
+                <div class="inputGroup">
+                  <span>사이즈 옵션이름</span>
+                  <input type="text" name="SIZE_OPT" id="SIZE_OPT" />
+                </div>
+                <div class="inputGroup">
+                  <span>BJ 옵션이름</span>
+                  <input type="text" name="BJ_OPT" id="BJ_OPT" />
+                </div>
+                <div class="inputGroup">
+                  <span>점수 옵션이름</span>
+                  <input type="text" name="POINT_OPT" id="POINT_OPT" />
+                </div>
+                <div class="inputGroup">
+                  <div>
+                    <span>조회 할 상품 ID</span>
+                  </div>
+                  <textarea
+                    name="PRODUCT_ID"
+                    id="PRODUCT_ID"
+                    cols="23"
+                    rows="3"
+                  ></textarea>
+                </div>
+                <div class="inputGroup">
+                  <div>
+                    <span>발주 확인 모드</span>
+                    <input
+                      type="checkbox"
+                      name="SHOW_BJ_POINT"
+                      id="SHOW_BJ_POINT"
+                    />
+                  </div>
+                </div>
+                <div class="inputGroup">
+                  <div>
+                    <span>판매 이벤트 진행</span>
+                    <input
+                      type="checkbox"
+                      name="SALE_EVENT_CHECK"
+                      id="SALE_EVENT_CHECK"
+                    />
+                  </div>
+                </div>
+                <div class="inputGroup">
+                  <span>현재 판매 중 상품 ID </span
+                  ><input
+                    type="text"
+                    name="SALE_EVENT_PRODUCT_ID"
+                    id="SALE_EVENT_PRODUCT_ID"
+                  />
+                </div>
 
-              <input type="submit" value="API 설정 저장" class="saveBtn" />
+                <input type="submit" value="API 설정 저장" class="saveBtn" />
+              </fieldset>
             </form>
+          </div>
+        </div>
+        <div class="tab">
+          <input type="radio" name="css-tabs" id="tab-2" class="tab-switch" />
+          <label for="tab-2" class="tab-label">방송 설정</label>
+          <div class="tab-content">
+            <form
+              action=""
+              method="post"
+              id="ttsConfigInputForm"
+              enctype="multipart/form-data"
+            >
+              <fieldset>
+                <legend>알림 조건 설정</legend>
+                <div class="inputGroup">
+                  <fieldset class="notiCaseInputField">
+                    <legend>조건 1</legend>
+                    <div class="caseNumInput">
+                      <div class="shortInput">
+                        <input
+                          type="number"
+                          name="FIRST_SOUND_UP"
+                          id="FIRST_SOUND_UP"
+                          value="1"
+                          disabled
+                        />
+                        이상
+                      </div>
+                      <div class="shortInput">
+                        <input
+                          type="number"
+                          name="FIRST_SOUND_DOWN"
+                          id="FIRST_SOUND_DOWN"
+                        />이하
+                      </div>
+                    </div>
+                    <div class="fileInput">
+                      <div class="shortInput">
+                        <div>
+                          현재 사운드 <span id="FIRST_SOUND_FILE_NAME"></span>
+                        </div>
+                        <input
+                          type="file"
+                          name="soundFile"
+                          id="FIRST_SOUND_FILE"
+                          accept="audio/*"
+                        />
+                      </div>
+                      <!-- <div class="shortInput">
+                        이미지
+                        <input
+                          type="file"
+                          name="imageFile"
+                          id="THIRD_Image_FILE"
+                          accept="image/*"
+                        />
+                      </div> -->
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="inputGroup">
+                  <fieldset class="notiCaseInputField">
+                    <legend>조건 2</legend>
+                    <div class="caseNumInput">
+                      <div class="shortInput">
+                        <input
+                          type="number"
+                          name="SECOND_SOUND_UP"
+                          id="SECOND_SOUND_UP"
+                        />이상
+                      </div>
+                      <div class="shortInput">
+                        <input
+                          type="number"
+                          name="SECOND_SOUND_DOWN"
+                          id="SECOND_SOUND_DOWN"
+                        />이하
+                      </div>
+                    </div>
+                    <div class="fileInput">
+                      <div class="shortInput">
+                        <div>
+                          현재 사운드 <span id="SECOND_SOUND_FILE_NAME"></span>
+                        </div>
+                        <input
+                          type="file"
+                          name="soundFile"
+                          id="SECOND_SOUND_FILE"
+                          accept="audio/*"
+                        />
+                      </div>
+                      <!-- <div class="shortInput">
+                        이미지
+                        <input
+                          type="file"
+                          name="imageFile"
+                          id="THIRD_Image_FILE"
+                          accept="image/*"
+                        />
+                      </div> -->
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="inputGroup">
+                  <fieldset class="notiCaseInputField">
+                    <legend>조건 3</legend>
+                    <div class="caseNumInput">
+                      <div class="shortInput">
+                        <input
+                          type="number"
+                          name="THIRD_SOUND_UP"
+                          id="THIRD_SOUND_UP"
+                        />이상
+                      </div>
+                      <div class="shortInput">
+                        <input
+                          type="hidden"
+                          name="THIRD_SOUND_DOWN"
+                          id="THIRD_SOUND_DOWN"
+                          value="1000"
+                        />
+                      </div>
+                    </div>
+                    <div class="fileInput">
+                      <div class="shortInput">
+                        <div>
+                          현재 사운드 <span id="THIRD_SOUND_FILE_NAME"></span>
+                        </div>
+                        <input
+                          type="file"
+                          name="soundFile"
+                          id="THIRD_SOUND_FILE"
+                          accept="audio/*"
+                        />
+                      </div>
+                      <!-- <div class="shortInput">
+                        이미지
+                        <input
+                          type="file"
+                          name="imageFile"
+                          id="THIRD_Image_FILE"
+                          accept="image/*"
+                        />
+                      </div> -->
+                    </div>
+                  </fieldset>
+                </div>
+                <input type="submit" class="saveBtn" value="설정 저장" />
+              </fieldset>
+            </form>
+            <fieldset class="notiImageInputField">
+              <legend>알림 이미지 설정</legend>
+              <input
+                class="file"
+                id="chooseFile"
+                type="file"
+                accept="image/png"
+              />
+              <button class="saveBtn">저장</button>
+            </fieldset>
+          </div>
+        </div>
+        <div class="tab">
+          <input type="radio" name="css-tabs" id="tab-3" class="tab-switch" />
+          <label for="tab-3" class="tab-label">기타 기능</label>
+          <div class="tab-content">
             <div class="links">
               <h2>
                 구매알림
@@ -207,110 +583,52 @@
                 ></a>
               </h2>
             </div>
-            <div class="count">
-              현재 상품 판매 개수 : <span id="preCount"></span>
-              <br />
-              총 판매 개수 : <span id="totalCount"></span>
+            <div id="explorers">
+              <fieldset>
+                <legend>저장소</legend>
+                <button
+                  id="resource"
+                  class="saveBtn"
+                  onclick="shell.openExternal(process.resourcesPath + '/public')"
+                >
+                  리소스 폴더
+                </button>
+                <button id="logsOpen" class="saveBtn">로그 폴더</button>
+                <button
+                  id="lists"
+                  class="saveBtn"
+                  onclick="shell.openExternal(process.resourcesPath + '/list')"
+                >
+                  리스트 폴더
+                </button>
+              </fieldset>
+              <fieldset id="notiControlField">
+                <legend>알림 컨트롤러</legend>
+                <div class="count">
+                  <div>현재 상품 판매 개수 : <span id="preCount"></span></div>
+                  <div>총 판매 개수 : <span id="totalCount"></span></div>
+                </div>
+                <div id="notiControl" class="inputGroup">
+                  <button id="notiStop" class="saveBtn">알림 일시정지</button>
+                  <button id="notiResume" class="saveBtn">알림 시작</button>
+                  <div>
+                    <button id="orderListFile" class="saveBtn">
+                      주문리스트
+                    </button>
+                    <button id="pointListFile" class="saveBtn">
+                      포인트리스트
+                    </button>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>결과 확인</legend>
+                <button id="orderResult" class="saveBtn">판매수량 확인</button>
+                <button id="pointResult" class="saveBtn">집계결과 확인</button>
+              </fieldset>
             </div>
           </div>
         </div>
-        <div class="tab">
-          <input type="radio" name="css-tabs" id="tab-2" class="tab-switch" />
-          <label for="tab-2" class="tab-label">Tab Two</label>
-          <div class="tab-content">
-            <h1>구매 알림 설정</h1>
-            <form
-              action="http://localhost:3000/config/tts"
-              method="POST"
-              id="ttsConfigInputForm"
-              enctype="multipart/form-data"
-            >
-              <input
-                type="number"
-                name="FIRST_SOUND_UP"
-                id="FIRST_SOUND_UP"
-              />이상
-              <input
-                type="number"
-                name="FIRST_SOUND_DOWN"
-                id="FIRST_SOUND_DOWN"
-              />이하
-              <input
-                type="file"
-                name="soundFile"
-                id="FIRST_SOUND_FILE"
-                accept="audio/*"
-              />
-              <input
-                type="number"
-                name="SECOND_SOUND_UP"
-                id="SECOND_SOUND_UP"
-              />이상
-              <input
-                type="number"
-                name="SECOND_SOUND_DOWN"
-                id="SECOND_SOUND_DOWN"
-              />이하
-              <input
-                type="file"
-                name="soundFile"
-                id="SECOND_SOUND_FILE"
-                accept="audio/*"
-              />
-              <input
-                type="number"
-                name="THIRD_SOUND_UP"
-                id="THIRD_SOUND_UP"
-              />이상
-              <input
-                type="number"
-                name="THIRD_SOUND_DOWN"
-                id="THIRD_SOUND_DOWN"
-              />이하
-              <input
-                type="file"
-                name="soundFile"
-                id="THIRD_SOUND_FILE"
-                accept="audio/*"
-              />
-              <input type="submit" value="저장" />
-            </form>
-          </div>
-        </div>
-        <div class="tab">
-          <input type="radio" name="css-tabs" id="tab-3" class="tab-switch" />
-          <label for="tab-3" class="tab-label">Tab Three</label>
-          <div class="tab-content">
-            When I left Mr. Bates, I went down to my father: where, by the
-            assistance of him and my uncle John, and some other relations, I got
-            forty pounds, and a promise of thirty pounds a year to maintain me
-            at Leyden: there I studied physic two years and seven months,
-            knowing it would be useful in long voyages.
-          </div>
-        </div>
-      </div>
-      <div id="notiControl">
-        <button id="notiStop" class="saveBtn">알림 일시정지</button>
-        <button id="notiResume" class="saveBtn">알림 시작</button>
-      </div>
-      <div id="explorers">
-        <button
-          id="resource"
-          class="saveBtn"
-          onclick="shell.openExternal(process.resourcesPath + '/public')"
-        >
-          리소스 폴더
-        </button>
-        <button id="logsOpen" class="saveBtn">로그 폴더</button>
-        <button
-          id="lists"
-          class="saveBtn"
-          onclick="shell.openExternal(process.resourcesPath + '/list')"
-        >
-          리스트 폴더
-        </button>
-        <button id="result" class="saveBtn">집계로그</button>
-        <button id="totalCount" class="saveBtn">판매수량</button>
       </div>
     </div>
   </body>
@@ -322,11 +640,13 @@
     const saleEventCheckbox = document.querySelector('#SALE_EVENT_CHECK')
     const saleEventProductId = document.querySelector('#SALE_EVENT_PRODUCT_ID')
     let countInterval
-    document.querySelector('#SALE_EVENT_CHECK')
 
     saleEventCheckbox.addEventListener('change', (event) => {
       event.preventDefault()
       saleEventProductId.disabled = !event.target.checked
+      if (!event.target.checked) {
+        saleEventProductId.value = ''
+      }
     })
     var socket = io.connect('http://localhost:3000')
 
@@ -343,6 +663,7 @@
       const notificationLink = document.querySelector('#notificationLink')
       const boardLink = document.querySelector('#boardLink')
       getApiConfig()
+      getTtsConfig()
       // 레이아웃 주소 가져오기
       ipcRenderer.on('ipAddress', (evt, ipAdress) => {
         notificationLink.href = `http://${ipAdress}:3000/notification`
@@ -354,7 +675,6 @@
 
       // 레이아웃 주소 가져오기
       ipcRenderer.on('userData', (evt, path) => {
-        console.log('userData', path)
         document
           .querySelector('#logsOpen')
           .addEventListener('click', function (event) {
@@ -363,11 +683,20 @@
           })
       })
 
-      // 레이아웃 주소 가져오기
+      // 포인트리스트 파일 가져오기
       ipcRenderer.on('pointList', (evt, path) => {
-        console.log('pointList', path)
         document
-          .querySelector('#result')
+          .querySelector('#pointListFile')
+          .addEventListener('click', function (event) {
+            event.preventDefault()
+            shell.openExternal(path)
+          })
+      })
+
+      // 주문리스트 파일 가져오기
+      ipcRenderer.on('orderList', (evt, path) => {
+        document
+          .querySelector('#orderListFile')
           .addEventListener('click', function (event) {
             event.preventDefault()
             shell.openExternal(path)
@@ -396,6 +725,30 @@
             data.SALE_EVENT_PRODUCT_ID
           document.getElementById('SALE_EVENT_PRODUCT_ID').disabled =
             !data.SALE_EVENT_CHECK
+        })
+    }
+
+    // TTS 설정 가져오기
+    function getTtsConfig() {
+      fetch('http://localhost:3000/config/tts')
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector('#FIRST_SOUND_UP').value = data.FIRST_SOUND_UP
+          document.querySelector('#FIRST_SOUND_DOWN').value =
+            data.FIRST_SOUND_DOWN
+          document.querySelector('#SECOND_SOUND_UP').value =
+            data.SECOND_SOUND_UP
+          document.querySelector('#SECOND_SOUND_DOWN').value =
+            data.SECOND_SOUND_DOWN
+          document.querySelector('#THIRD_SOUND_UP').value = data.THIRD_SOUND_UP
+          document.querySelector('#THIRD_SOUND_DOWN').value =
+            data.THIRD_SOUND_DOWN
+          document.querySelector('#FIRST_SOUND_FILE_NAME').innerText =
+            data.FIRST_SOUND_FILE
+          document.querySelector('#SECOND_SOUND_FILE_NAME').innerText =
+            data.SECOND_SOUND_FILE
+          document.querySelector('#THIRD_SOUND_FILE_NAME').innerText =
+            data.THIRD_SOUND_FILE
         })
     }
 
@@ -429,8 +782,6 @@
       showConfirmButton: false,
       timer: 3000,
     })
-
-    document.getElementById('test').innerHTML = process.resourcesPath // 디버그용
 
     // API 설정 서브밋 액션
     form.addEventListener('submit', async (event) => {
@@ -467,12 +818,12 @@
       if (response) {
         await Toast.fire({
           icon: 'success',
-          title: 'Success',
+          title: '저장에 성공했습니다',
         })
       } else {
         await Toast.fire({
-          icon: 'false',
-          title: 'false',
+          icon: 'error',
+          title: '저장에 실패했습니다',
         })
       }
     })
@@ -481,13 +832,20 @@
       event.preventDefault()
       const formData = new FormData()
       const numInput = ttsForm.querySelectorAll('input[type="number"]')
+      const hiddenInput = ttsForm.querySelectorAll('input[type="hidden"]')
       const fileInput = ttsForm.querySelectorAll('input[type="file"]')
-      console.log(numInput)
       for (var i = 0; i < numInput.length; i++) {
         if (numInput[i].value) {
           formData.append(numInput[i].name, numInput[i].value)
         } else {
           formData.append(numInput[i].name, '')
+        }
+      }
+      for (var i = 0; i < hiddenInput.length; i++) {
+        if (hiddenInput[i].value) {
+          formData.append(hiddenInput[i].name, hiddenInput[i].value)
+        } else {
+          formData.append(hiddenInput[i].name, '')
         }
       }
 
@@ -511,26 +869,66 @@
       })
 
       if (response) {
+        await getTtsConfig()
         await Toast.fire({
           icon: 'success',
-          title: 'Success',
+          title: '저장에 성공했습니다',
         })
       } else {
+        await getTtsConfig()
         await Toast.fire({
-          icon: 'false',
-          title: 'false',
+          icon: 'error',
+          title: '저장에 실패했습니다',
         })
       }
     })
 
     async function getCount() {
-      await fetch('http://localhost:3000/order/counter')
+      await fetch('http://localhost:3000/order/count')
         .then((response) => response.json())
         .then((data) => {
-          console.log(data)
-          document.querySelector('#preCount').innerText = data.present
-          document.querySelector('#totalCount').innerText = data.total
+          document.querySelector('#preCount').innerText = data.PreCount
+          document.querySelector('#totalCount').innerText = data.TotalCount
         })
     }
+    document
+      .querySelector('#orderResult')
+      .addEventListener('click', (event) => {
+        event.preventDefault()
+        location.href = `http://localhost:3000/order/result`
+      })
+
+    document
+      .querySelector('#pointResult')
+      .addEventListener('click', (event) => {
+        event.preventDefault()
+        location.href = `http://localhost:3000/scoreboard/result`
+      })
+
+    document
+      .querySelector('.notiImageInputField .saveBtn')
+      .addEventListener('click', async function (event) {
+        event.preventDefault()
+        let file = document.querySelector('#chooseFile').files[0]
+        let fileForm = new FormData()
+        fileForm.append('imageFile', file)
+
+        let response = await fetch('http://localhost:3000/noti/image', {
+          method: 'POST',
+          body: fileForm,
+        })
+
+        if (response.ok) {
+          await Toast.fire({
+            icon: 'success',
+            title: '저장에 성공했습니다',
+          })
+        } else {
+          await Toast.fire({
+            icon: 'error',
+            title: '저장에 실패했습니다',
+          })
+        }
+      })
   </script>
 </html>

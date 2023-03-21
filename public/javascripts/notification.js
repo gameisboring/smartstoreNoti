@@ -42,7 +42,6 @@ socket.on('resume', function (msg) {
 })
 
 socket.on('orderList', function (msg) {
-  console.log(msg)
   if (typeof msg == 'string') {
   } else if (typeof msg == 'object') {
     if (msg.length >= 0) {
@@ -58,10 +57,14 @@ socket.on('orderList', function (msg) {
 
 async function tick() {
   console.log('남은 주문 : ' + list.length + '개')
+  const ttsConfig = await fetch('/config/tts')
+    .then((response) => response.json())
+    .then((data) => {
+      return data
+    })
   if (list.length > 0) {
     const el = list.shift()
-    const API = await fetch('public/myJson.json')
-    console.log(API)
+
     var notiSound = new Audio()
     var notiTextToSpeach = new Audio(
       `http://nstream.kr:1322/` +
@@ -70,11 +73,11 @@ async function tick() {
     )
 
     if (el.quantity >= 1 && el.quantity < 5) {
-      notiSound.src = `sounds/first.mp3`
+      notiSound.src = `sounds/${ttsConfig.FIRST_SOUND_FILE}`
     } else if (el.quantity >= 5 && el.quantity < 10) {
-      notiSound.src = `sounds/second.mp3`
+      notiSound.src = `sounds/${ttsConfig.SECOND_SOUND_FILE}`
     } else if (el.quantity >= 10) {
-      notiSound.src = `sounds/third.mp3`
+      notiSound.src = `sounds/${ttsConfig.THIRD_SOUND_FILE}`
     } else {
       return
     }
@@ -102,7 +105,7 @@ async function tick() {
           html: `<span class="msgText">${el.text}</span>`,
           timer: timer,
           // timerProgressBar: true,
-          imageUrl: '/noti/image',
+          imageUrl: '/images/noti.png',
           imageHeight: 300,
           imageAlt: 'A image',
           color: '#716add',

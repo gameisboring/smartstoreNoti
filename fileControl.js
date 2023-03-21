@@ -19,7 +19,6 @@ module.exports = () => {
     fs.readFileSync(appResourcePath + '/APIconfig.json')
   } catch (error) {
     log.info(`file writing .... APIconfig.json`)
-  } finally {
     fs.writeFile(
       appResourcePath + '/APIconfig.json',
       JSON.stringify(basicAPIconfig),
@@ -34,7 +33,6 @@ module.exports = () => {
     fs.readFileSync(appResourcePath + '/ttsConfig.json')
   } catch (error) {
     log.info(`file writing .... ttsConfig.json`)
-  } finally {
     fs.writeFile(
       appResourcePath + '/ttsConfig.json',
       JSON.stringify(basicTTSconfig),
@@ -49,7 +47,6 @@ module.exports = () => {
     fs.readdirSync(appResourcePath + '/list')
   } catch (error) {
     log.info(`folder making .... ${appResourcePath}/list`)
-  } finally {
     fs.mkdir(appResourcePath + '/list', () => {
       check.listFolder = appResourcePath + '/list'
     })
@@ -90,23 +87,4 @@ module.exports = () => {
       }
     )
   }
-
-  //   present order list file
-  /* try {
-    fs.readFileSync(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pre_list.json`
-    )
-  } catch {
-    log.info(`file writing .... ${dateFormat(hoursAgo(6))}_pre_list.json`)
-    fs.writeFile(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pre_list.json`,
-      '[]',
-      () => {
-        check.listFile =
-          appResourcePath +
-          '/list' +
-          `/${dateFormat(hoursAgo(6))}_pre_list.json`
-      }
-    )
-  } */
 }

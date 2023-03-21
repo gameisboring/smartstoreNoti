@@ -9,7 +9,7 @@
     "deploy": "electron-builder --win nsis:x64"
   },
   "build": {
-    "productName": "test",
+    "productName": "Smart Store Alarm 1.0",
     "appId": "com.electron.hello",
     "asar": true,
     "protocols": {
@@ -23,7 +23,7 @@
         "zip",
         "nsis"
       ],
-      "icon": "./resources/installer/Icon.ico"
+      "icon": "./public/images/icon.png"
     },
     "nsis": {
       "oneClick": false,

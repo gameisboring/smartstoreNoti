@@ -42,9 +42,11 @@ function createWindow() {
   // 새로운 브라우저 창을 생성합니다.
   win = new BrowserWindow({
     width: 800,
-    height: 1000,
+    height: 800,
+    resizable: false,
     useContentSize: true,
     titleBarStyle: 'hiddenInset',
+    icon: path.join(__dirname, 'public/images/icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -70,6 +72,15 @@ function createWindow() {
         process.resourcesPath,
         '/list',
         dateFormat(hoursAgo(6)) + '_pointList.json'
+      )
+    )
+
+    win.webContents.send(
+      'orderList',
+      path.join(
+        process.resourcesPath,
+        '/list',
+        dateFormat(hoursAgo(6)) + '_list.json'
       )
     )
   })
