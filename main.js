@@ -42,7 +42,7 @@ function createWindow() {
   // 새로운 브라우저 창을 생성합니다.
   win = new BrowserWindow({
     width: 800,
-    height: 800,
+    height: 886,
     resizable: false,
     useContentSize: true,
     titleBarStyle: 'hiddenInset',
@@ -50,7 +50,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      //enableRemoteModule: true,
+      // enableRemoteModule: true,
     },
   })
 

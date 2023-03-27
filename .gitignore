@@ -5,7 +5,6 @@
 /example.js
 /test
 /key.json
-/tts-api-account.json
 config/ApiConfig.json
 example.js
-
+/public/tts-api-account.json

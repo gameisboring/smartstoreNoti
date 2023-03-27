@@ -163,8 +163,8 @@ module.exports = class ApiControls {
           nick: mappedData[i].nick,
           productOrderId: mappedData[i].productOrderId,
           productId: mappedData[i].productId,
-          bj: mappedData[i].bj,
-          point: mappedData[i].point,
+          bj: mappedData[i].bj ? mappedData[i].bj : '',
+          point: mappedData[i].point ? mappedData[i].point : '',
           orderDate: mappedData[i].date,
           quantity: mappedData[i].quantity,
         })
@@ -190,10 +190,14 @@ module.exports = class ApiControls {
    */
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
-
+    const { SALE_EVENT_CHECK } = await JSON.parse(
+      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+    )
     if (!oauthToken) {
       return false
     }
+
+    console.log(SALE_EVENT_CHECK)
     return new Promise((resolve, reject) => {
       axios({
         method: 'get',
@@ -204,8 +208,10 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          // 10초 전
-          lastChangedFrom: new Date(new Date().getTime() - 10000),
+          // 3분 전
+          lastChangedFrom: new Date(
+            new Date().getTime() - (SALE_EVENT_CHECK ? 5000 : 180000)
+          ),
           // lastChangedFrom: new Date(new Date().toDateString()),
           lastChangedType: 'PAYED',
         },

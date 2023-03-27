@@ -18,7 +18,7 @@ socket.on('connection', function (reason) {
   notiReqCallback()
   notiInfoReqInterval = setInterval(function () {
     socket.emit('getOrderList')
-  }, 10000)
+  }, 4000)
 
   notiPopUpInterval = setTimeout(tick, 100)
 })
@@ -36,7 +36,7 @@ socket.on('resume', function (msg) {
   Swal.resumeTimer()
   notiInfoReqInterval = setInterval(function () {
     socket.emit('getOrderList')
-  }, 10000)
+  }, 4000)
 
   notiPopUpInterval = setTimeout(tick, 100)
 })
@@ -57,30 +57,44 @@ socket.on('orderList', function (msg) {
 
 async function tick() {
   console.log('남은 주문 : ' + list.length + '개')
-  const ttsConfig = await fetch('/config/tts')
-    .then((response) => response.json())
-    .then((data) => {
-      return data
-    })
+
   if (list.length > 0) {
     const el = list.shift()
-
     var notiSound = new Audio()
-    var notiTextToSpeach = new Audio(
-      `http://nstream.kr:1322/` +
-        `${el.nick}님. ${el.productName} ${el.quantity}개 구매 감사합니다..
-        ${el.bj ? el.bj : ''} ${el.point ? el.point : ''}..${el.text}`
-    )
 
-    if (el.quantity >= 1 && el.quantity < 5) {
-      notiSound.src = `sounds/${ttsConfig.FIRST_SOUND_FILE}`
-    } else if (el.quantity >= 5 && el.quantity < 10) {
-      notiSound.src = `sounds/${ttsConfig.SECOND_SOUND_FILE}`
-    } else if (el.quantity >= 10) {
-      notiSound.src = `sounds/${ttsConfig.THIRD_SOUND_FILE}`
-    } else {
-      return
-    }
+    var reqUrl = `http://nstream.kr:1322/tts/${
+      el.nick ? el.nick + '님' : ''
+    }. ${el.productName ? el.productName : ''} ${
+      el.quantity ? el.quantity + '개' : ''
+    } 구매 감사합니다..
+    ${el.bj ? el.bj : ''}${el.point ? el.point + '..' : ''} ${
+      el.text ? el.text : ''
+    }`
+
+    await fetch('/config/tts')
+      .then((response) => response.json())
+      .then((data) => {
+        if (
+          Number(el.quantity) >= Number(data.FIRST_SOUND_UP) &&
+          Number(el.quantity) <= Number(data.FIRST_SOUND_DOWN)
+        ) {
+          notiSound.src = `sounds/${data.FIRST_SOUND_FILE}`
+        } else if (
+          Number(el.quantity) >= Number(data.SECOND_SOUND_UP) &&
+          Number(el.quantity) <= Number(data.SECOND_SOUND_DOWN)
+        ) {
+          notiSound.src = `sounds/${data.SECOND_SOUND_FILE}`
+        } else if (Number(el.quantity) >= Number(data.THIRD_SOUND_UP)) {
+          notiSound.src = `sounds/${data.THIRD_SOUND_FILE}`
+        } else {
+          return
+        }
+
+        reqUrl += '/' + data.SPEAKING_RATE + '/' + data.SPEAKING_VOICE
+      })
+
+    console.log(reqUrl)
+    var notiTextToSpeach = new Audio(reqUrl)
 
     notiSound.load()
     notiTextToSpeach.load()

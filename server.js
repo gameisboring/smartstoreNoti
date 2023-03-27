@@ -1,5 +1,4 @@
 const express = require('express')
-const electron = require('electron')
 const path = require('path')
 const fs = require('fs')
 const log = require('electron-log')
@@ -12,6 +11,8 @@ const server = app2.listen(PORT, function () {
 })
 app2.use(express.json())
 app2.use(express.urlencoded({ extended: false }))
+
+// var { quickStart } = require('./tts')
 
 const SocketIO = require('socket.io')
 const io = SocketIO(server, { path: '/socket.io' })
@@ -91,17 +92,13 @@ app2.get('/order/result', async function (req, res) {
     path.join(
       process.resourcesPath,
       '/list',
-      dateFormat(hoursAgo(6)) + '_판매수량.json'
+      dateFormat(hoursAgo(6)) + '_result.json'
     ),
     JSON.stringify(count),
     function () {
-      res.download(
-        path.join(
-          process.resourcesPath,
-          '/list',
-          dateFormat(hoursAgo(6)) + '_판매수량.json'
-        )
-      )
+      res.json({
+        url: dateFormat(hoursAgo(6)) + '_result.json',
+      })
     }
   )
 })
@@ -119,17 +116,11 @@ app2.get('/scoreboard/result', async function (req, res) {
     path.join(
       process.resourcesPath,
       '/list',
-      dateFormat(hoursAgo(6)) + '_집계결과.json'
+      dateFormat(hoursAgo(6)) + '_pointResult.json'
     ),
     JSON.stringify(dataList),
     function () {
-      res.download(
-        path.join(
-          process.resourcesPath,
-          '/list',
-          dateFormat(hoursAgo(6)) + '_집계결과.json'
-        )
-      )
+      res.json({ url: dateFormat(hoursAgo(6)) + '_pointResult.json' })
     }
   )
 })
@@ -204,6 +195,56 @@ app2.post('/config/tts', SoundUpload.array('soundFile'), (req, res, next) => {
   }
 })
 
+// 다중 파일 업로드
+app2.post('/config/speak', (req, res, next) => {
+  let obj = JSON.parse(JSON.stringify(req.body))
+  if (req.body) {
+    try {
+      let data = JSON.parse(
+        fs.readFileSync(process.resourcesPath + '/ttsConfig.json', 'utf-8')
+      )
+      data.SPEAKING_RATE = obj.SPEAKING_RATE
+      data.SPEAKING_VOICE = obj.SPEAKING_VOICE
+      fs.writeFile(
+        process.resourcesPath + '/ttsConfig.json',
+        JSON.stringify(data),
+        'utf-8',
+        () => {
+          log.info('알림 설정 변경', JSON.stringify(obj))
+          res.status(200).send({
+            ok: true,
+          })
+        }
+      )
+    } catch (error) {
+      log.error(error)
+      res.status(200).send({
+        ok: false,
+      })
+    }
+  }
+})
+
+/* 설정 변경 */
+app2.post('/config/test', function (req, res) {
+  log.info(`POST /config/test`)
+  if (req.body) {
+    io.emit('orderList', [
+      {
+        quantity: req.body.TEST_QUANTITY,
+        nick: req.body.TEST_NICK,
+        text: req.body.TEST_TEXT,
+        bj: req.body.TEST_BJ,
+        point: req.body.TEST_POINT,
+        productName: req.body.TEST_PRODUCT,
+      },
+    ])
+    res.send({ ok: true })
+  } else {
+    res.send(false)
+  }
+})
+
 app2.get('/noti/image', function (req, res) {
   log.info(`GET /noti/image`)
   if (fs.existsSync(process.resourcesPath + '/public/images/noti.png')) {
@@ -236,6 +277,17 @@ app2.get('/noti/resume', function (req, res) {
   io.emit('resume', 'notification resume !!!')
   res.send(true)
 })
+
+/* app2.get('/tts/:text/:speakingRate', async function (req, res) {
+  await quickStart(req.params.text, req.params.speakingRate)
+    .then(() => {
+      res.sendFile(path.join(process.resourcesPath, '/public/output.mp3'))
+    })
+    .catch((reason) => {
+      log.error('quickStart', reason)
+      res.send(reason)
+    })
+}) */
 
 io.on('connection', function (socket) {
   log.info(socket.id, 'Connected')

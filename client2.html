@@ -68,7 +68,7 @@
         top: 0;
         margin: 0;
         background: #000000;
-        height: 750px;
+        height: 836px;
       }
       .tabs::before,
       .tabs::after {
@@ -259,7 +259,6 @@
 
       .shortInput {
         display: flex;
-        justify-content: space-evenly;
         gap: 15px;
         flex-direction: row;
         width: 100%;
@@ -302,6 +301,69 @@
       }
       .notiImageInputField .saveBtn {
         margin: 0;
+      }
+      #testInputForm .inputGroup.evenly {
+        justify-content: space-between;
+      }
+
+      #testInputForm .inputGroup {
+        justify-content: left;
+        gap: 15px;
+      }
+
+      #testInputForm .shortInput {
+        width: fit-content;
+        align-items: flex-end;
+      }
+      #testInputForm input[type='text'],
+      #testInputForm input[type='number'] {
+        width: 200px;
+        font-size: 24px;
+        background-color: transparent;
+        color: white;
+        border: 0;
+        border-bottom: 2px solid white;
+        text-align: center;
+      }
+
+      #testInputForm input[type='text']:focus,
+      #testInputForm input[type='number']:focus {
+        outline: none;
+      }
+
+      #addIdBtn {
+        position: relative;
+        left: 0px;
+        font-size: 15px;
+        height: 40px;
+        width: 115px;
+        background-color: #ffffff;
+        border: 0;
+        transition: all 0.1s ease-in;
+      }
+
+      #addIdBtn:hover {
+        background-color: #2b2b2b;
+        color: white;
+        cursor: pointer;
+      }
+
+      #SALE_EVENT_PRODUCT_ID {
+        width: 285px;
+      }
+
+      #sampleAudioPlay {
+        background-color: transparent;
+        font-size: 28px;
+      }
+
+      #sampleAudioPlay:hover {
+        cursor: pointer;
+      }
+
+      .flex-col {
+        display: flex;
+        flex-direction: column;
       }
     </style>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -378,7 +440,7 @@
                 </div>
                 <div class="inputGroup">
                   <div>
-                    <span>판매 이벤트 진행</span>
+                    <span>발주 미확인 모드</span>
                     <input
                       type="checkbox"
                       name="SALE_EVENT_CHECK"
@@ -387,12 +449,13 @@
                   </div>
                 </div>
                 <div class="inputGroup">
-                  <span>현재 판매 중 상품 ID </span
-                  ><input
+                  <span>현재 판매 중 상품 ID </span>
+                  <input
                     type="text"
                     name="SALE_EVENT_PRODUCT_ID"
                     id="SALE_EVENT_PRODUCT_ID"
                   />
+                  <button id="addIdBtn">조회 할 상품에 추가</button>
                 </div>
 
                 <input type="submit" value="API 설정 저장" class="saveBtn" />
@@ -422,7 +485,6 @@
                           name="FIRST_SOUND_UP"
                           id="FIRST_SOUND_UP"
                           value="1"
-                          disabled
                         />
                         이상
                       </div>
@@ -446,15 +508,6 @@
                           accept="audio/*"
                         />
                       </div>
-                      <!-- <div class="shortInput">
-                        이미지
-                        <input
-                          type="file"
-                          name="imageFile"
-                          id="THIRD_Image_FILE"
-                          accept="image/*"
-                        />
-                      </div> -->
                     </div>
                   </fieldset>
                 </div>
@@ -489,15 +542,6 @@
                           accept="audio/*"
                         />
                       </div>
-                      <!-- <div class="shortInput">
-                        이미지
-                        <input
-                          type="file"
-                          name="imageFile"
-                          id="THIRD_Image_FILE"
-                          accept="image/*"
-                        />
-                      </div> -->
                     </div>
                   </fieldset>
                 </div>
@@ -534,18 +578,10 @@
                           accept="audio/*"
                         />
                       </div>
-                      <!-- <div class="shortInput">
-                        이미지
-                        <input
-                          type="file"
-                          name="imageFile"
-                          id="THIRD_Image_FILE"
-                          accept="image/*"
-                        />
-                      </div> -->
                     </div>
                   </fieldset>
                 </div>
+
                 <input type="submit" class="saveBtn" value="설정 저장" />
               </fieldset>
             </form>
@@ -559,6 +595,48 @@
               />
               <button class="saveBtn">저장</button>
             </fieldset>
+            <div class="inputGroup">
+              <fieldset class="notiCaseInputField">
+                <legend>TTS 설정</legend>
+                <div
+                  style="
+                    display: flex;
+                    width: 100%;
+                    justify-content: space-around;
+                  "
+                >
+                  <div class="flex-col">
+                    <div class="shortInput" style="justify-content: center">
+                      음성 속도
+                      <input
+                        type="number"
+                        name="SPEAKING_RATE"
+                        id="SPEAKING_RATE"
+                        step="0.1"
+                        value="1.0"
+                      />
+                    </div>
+                    <div class="shortInput" style="justify-content: center">
+                      음성 종류<select
+                        name="SPEAKING_VOICE"
+                        id="SPEAKING_VOICE"
+                      >
+                        <option value="ko-KR-Standard-A" selected>
+                          여성 A
+                        </option>
+                        <option value="ko-KR-Standard-B">여성 B</option>
+                        <option value="ko-KR-Standard-C">남성 A</option>
+                        <option value="ko-KR-Standard-D">남성 B</option>
+                      </select>
+                      <button id="sampleAudioPlay">🔊</button>
+                      <audio id="sampleAudio"></audio>
+                    </div>
+                  </div>
+
+                  <button class="saveBtn" id="speakConfig">저장</button>
+                </div>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div class="tab">
@@ -605,8 +683,12 @@
               <fieldset id="notiControlField">
                 <legend>알림 컨트롤러</legend>
                 <div class="count">
-                  <div>현재 상품 판매 개수 : <span id="preCount"></span></div>
-                  <div>총 판매 개수 : <span id="totalCount"></span></div>
+                  <div id="nowSaleCountDiv">
+                    현재 상품 판매 개수 : <span id="preCount"></span>
+                  </div>
+                  <div id="totalSaleCountDiv">
+                    총 판매 개수 : <span id="totalCount"></span>
+                  </div>
                 </div>
                 <div id="notiControl" class="inputGroup">
                   <button id="notiStop" class="saveBtn">알림 일시정지</button>
@@ -626,6 +708,80 @@
                 <button id="orderResult" class="saveBtn">판매수량 확인</button>
                 <button id="pointResult" class="saveBtn">집계결과 확인</button>
               </fieldset>
+              <fieldset>
+                <legend>알림 테스트</legend>
+                <form action="" method="post" id="testInputForm">
+                  <div class="inputGroup">
+                    <div class="shortInput">
+                      <span>닉네임</span
+                      ><input
+                        type="text"
+                        name="TEST_NICK"
+                        id="TEST_NICK"
+                        style="width: 250px"
+                        required
+                      />
+                    </div>
+                    <div class="shortInput">
+                      <span>메세지</span
+                      ><input
+                        type="text"
+                        name="TEST_TEXT"
+                        id="TEST_TEXT"
+                        style="width: 250px"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="inputGroup">
+                    <div class="shortInput">
+                      <span>상품명</span
+                      ><input
+                        type="text"
+                        name="TEST_PRODUCT"
+                        id="TEST_PRODUCT"
+                        style="width: 200px"
+                        required
+                      />
+                    </div>
+                    <div class="shortInput">
+                      <span>수량</span
+                      ><input
+                        type="text"
+                        name="TEST_QUANTITY"
+                        id="TEST_QUANTITY"
+                        style="width: 50px"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="evenly inputGroup">
+                    <div style="display: flex; gap: 15px">
+                      <div class="shortInput">
+                        <span>BJ</span
+                        ><input
+                          type="text"
+                          name="TEST_BJ"
+                          id="TEST_BJ"
+                          style="width: 150px"
+                        />
+                      </div>
+                      <div class="shortInput">
+                        <span>플마</span
+                        ><input
+                          type="text"
+                          name="TEST_POINT"
+                          id="TEST_POINT"
+                          style="width: 150px"
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" id="sendTest" class="saveBtn">
+                      테스트 전송
+                    </button>
+                  </div>
+                </form>
+              </fieldset>
             </div>
           </div>
         </div>
@@ -644,10 +800,23 @@
     saleEventCheckbox.addEventListener('change', (event) => {
       event.preventDefault()
       saleEventProductId.disabled = !event.target.checked
+      document.getElementById('SHOW_BJ_POINT').checked = !event.target.checked
       if (!event.target.checked) {
+        document.querySelector('#nowSaleCountDiv').style.display = 'none'
         saleEventProductId.value = ''
+      } else {
+        document.querySelector('#nowSaleCountDiv').style.display = 'block'
       }
     })
+
+    document
+      .getElementById('SHOW_BJ_POINT')
+      .addEventListener('change', (event) => {
+        event.preventDefault()
+        saleEventCheckbox.checked = !event.target.checked
+        saleEventProductId.disabled = event.target.checked
+      })
+
     var socket = io.connect('http://localhost:3000')
 
     socket.on('connection', async function (reason) {
@@ -702,6 +871,9 @@
             shell.openExternal(path)
           })
       })
+
+      document.querySelector('#sampleAudio').src =
+        process.resourcesPath + '/public/sounds/ko-KR-Standard-A.wav'
     }
 
     // API 설정 가져오기
@@ -749,6 +921,10 @@
             data.SECOND_SOUND_FILE
           document.querySelector('#THIRD_SOUND_FILE_NAME').innerText =
             data.THIRD_SOUND_FILE
+          document.querySelector('#SPEAKING_RATE').value = Number(
+            data.SPEAKING_RATE
+          )
+          document.querySelector('#SPEAKING_VOICE').value = data.SPEAKING_VOICE
         })
     }
 
@@ -834,6 +1010,7 @@
       const numInput = ttsForm.querySelectorAll('input[type="number"]')
       const hiddenInput = ttsForm.querySelectorAll('input[type="hidden"]')
       const fileInput = ttsForm.querySelectorAll('input[type="file"]')
+
       for (var i = 0; i < numInput.length; i++) {
         if (numInput[i].value) {
           formData.append(numInput[i].name, numInput[i].value)
@@ -884,7 +1061,7 @@
     })
 
     async function getCount() {
-      await fetch('http://localhost:3000/order/count')
+      fetch('http://localhost:3000/order/count')
         .then((response) => response.json())
         .then((data) => {
           document.querySelector('#preCount').innerText = data.PreCount
@@ -895,14 +1072,24 @@
       .querySelector('#orderResult')
       .addEventListener('click', (event) => {
         event.preventDefault()
-        location.href = `http://localhost:3000/order/result`
+        fetch(`http://localhost:3000/order/result`)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.url)
+            shell.openExternal(process.resourcesPath + '/list/' + data.url)
+          })
       })
 
     document
       .querySelector('#pointResult')
       .addEventListener('click', (event) => {
         event.preventDefault()
-        location.href = `http://localhost:3000/scoreboard/result`
+        fetch(`http://localhost:3000/scoreboard/result`)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.url)
+            shell.openExternal(process.resourcesPath + '/list/' + data.url)
+          })
       })
 
     document
@@ -925,6 +1112,79 @@
           })
         } else {
           await Toast.fire({
+            icon: 'error',
+            title: '저장에 실패했습니다',
+          })
+        }
+      })
+
+    document
+      .querySelector('#testInputForm')
+      .addEventListener('submit', async function (event) {
+        event.preventDefault()
+        const inputs = event.target.querySelectorAll('input')
+        const formData = new Object()
+
+        for (var i = 0; i < inputs.length; i++) {
+          formData[inputs[i].name] = inputs[i].value
+        }
+        await fetch('http://localhost:3000/config/test', {
+          method: 'POST', // *GET, POST, PUT, DELETE 등
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'multipart/form-data',
+          },
+          body: JSON.stringify(formData), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
+        })
+      })
+
+    form.querySelector('#addIdBtn').addEventListener('click', function (event) {
+      event.preventDefault()
+      form.querySelector('#PRODUCT_ID').value += `,${
+        form.querySelector('#SALE_EVENT_PRODUCT_ID').value
+      }`
+    })
+
+    document
+      .querySelector('#SPEAKING_VOICE')
+      .addEventListener('change', (event) => {
+        event.preventDefault()
+        document.querySelector('#sampleAudio').src =
+          process.resourcesPath +
+          '/public/sounds/' +
+          event.target.value +
+          '.wav'
+      })
+
+    document
+      .querySelector('#sampleAudioPlay')
+      .addEventListener('click', (event) => {
+        event.preventDefault()
+        document.querySelector('#sampleAudio').play()
+      })
+
+    document
+      .querySelector('#speakConfig')
+      .addEventListener('click', async (event) => {
+        event.preventDefault()
+        let response = await fetch('http://localhost:3000/config/speak', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            SPEAKING_RATE: document.querySelector('#SPEAKING_RATE').value,
+            SPEAKING_VOICE: document.querySelector('#SPEAKING_VOICE').value,
+          }), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
+        })
+        console.log(response)
+        if (response.ok) {
+          Toast.fire({
+            icon: 'success',
+            title: '저장에 성공했습니다',
+          })
+        } else {
+          Toast.fire({
             icon: 'error',
             title: '저장에 실패했습니다',
           })
