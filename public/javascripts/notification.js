@@ -62,11 +62,9 @@ async function tick() {
     const el = list.shift()
     var notiSound = new Audio()
 
-    var reqUrl = `http://nstream.kr:1322/tts/${
-      el.nick ? el.nick + '님' : ''
-    }. ${el.productName ? el.productName : ''} ${
-      el.quantity ? el.quantity + '개' : ''
-    } 구매 감사합니다..
+    var reqUrl = `http://nstream.kr:1322/${el.nick ? el.nick + '님' : ''}. ${
+      el.productName ? el.productName : ''
+    } ${el.quantity ? el.quantity + '개' : ''} 구매 감사합니다..
     ${el.bj ? el.bj : ''}${el.point ? el.point + '..' : ''} ${
       el.text ? el.text : ''
     }`

@@ -60,11 +60,6 @@ module.exports = class ApiControls {
     })
   }
 
-  async addToPointList(mappedData) {
-    // 2023-01-01_pointList.json
-    // 리스트 파일로 저장
-  }
-
   /**
    * Compare to Existing Order List
    */
@@ -110,12 +105,7 @@ module.exports = class ApiControls {
                 mappedData[i].point ? mappedData[i].point : ''
               } | 판매 이벤트 참여 : 참여`
             )
-            orderedList.push({
-              no: orderedList.length,
-              productOrderId: mappedData[i].productOrderId,
-              productId: mappedData[i].productId,
-              presentSaleEvent: true,
-            })
+
             // 구매 알림리스트에 추가
             notiOrders.push(mappedData[i])
           } else {
@@ -129,23 +119,25 @@ module.exports = class ApiControls {
                 mappedData[i].point ? mappedData[i].point : ''
               } | 판매 이벤트 참여 : 참여 안함`
             )
-
-            orderedList.push({
-              no: orderedList.length,
-              productOrderId: mappedData[i].productOrderId,
-              productId: mappedData[i].productId,
-              presentSaleEvent: false,
-            })
           }
+
+          orderedList.push({
+            no: orderedList.length,
+            productOrderId: mappedData[i].productOrderId,
+            productId: mappedData[i].productId,
+            presentSaleEvent:
+              mappedData[i].productId == API.SALE_EVENT_PRODUCT_ID,
+            quantity: mappedData[i].quantity,
+          })
         } else {
           orderedList.push({
             no: orderedList.length,
             productOrderId: mappedData[i].productOrderId,
             productId: mappedData[i].productId,
-            presentSaleEvent: false,
+            presentSaleEvent: API.SALE_EVENT_CHECK,
+            quantity: mappedData[i].quantity,
           })
 
-          notiOrders.push(mappedData[i])
           // 판매 이벤트 진행 안함
           log.info(
             `[새로운 주문] 주문번호:${mappedData[i].productOrderId} | 상품:${
@@ -158,6 +150,10 @@ module.exports = class ApiControls {
           )
         }
 
+        if (mappedData[i].bj && mappedData[i].point) {
+          notiOrders.push(mappedData[i])
+        }
+
         pointList.push({
           no: pointList.length,
           nick: mappedData[i].nick,
@@ -167,6 +163,7 @@ module.exports = class ApiControls {
           point: mappedData[i].point ? mappedData[i].point : '',
           orderDate: mappedData[i].date,
           quantity: mappedData[i].quantity,
+          price: mappedData[i].price,
         })
       }
     }
@@ -197,7 +194,6 @@ module.exports = class ApiControls {
       return false
     }
 
-    console.log(SALE_EVENT_CHECK)
     return new Promise((resolve, reject) => {
       axios({
         method: 'get',
@@ -210,7 +206,7 @@ module.exports = class ApiControls {
         params: {
           // 3분 전
           lastChangedFrom: new Date(
-            new Date().getTime() - (SALE_EVENT_CHECK ? 5000 : 180000)
+            new Date().getTime() - (SALE_EVENT_CHECK ? 10000 : 180000)
           ),
           // lastChangedFrom: new Date(new Date().toDateString()),
           lastChangedType: 'PAYED',
@@ -249,7 +245,7 @@ module.exports = class ApiControls {
       point: new RegExp(`(?<=${API.POINT_OPT}: )(.*?)(?= \/)`),
     }
     const orderList = await this.getChangeList()
-    const check = this.compareExOrderList
+    const { compareExOrderList } = this
     if (orderList.length == 0) {
       return 'There are no new orders.'
     } else if (
@@ -293,10 +289,11 @@ module.exports = class ApiControls {
 
             orders = orders.map(function (productOrder) {
               const options = productOrder.productOrder.productOption + ' /'
-              var returnVal = {
+              return {
                 productOrderId: productOrder.productOrder.productOrderId,
                 productId: productOrder.productOrder.productId,
                 quantity: productOrder.productOrder.quantity,
+                price: productOrder.productOrder.totalPaymentAmount,
                 nick: options.match(RegexObj.nick)
                   ? options.match(RegexObj.nick)[0]
                   : '',
@@ -316,7 +313,6 @@ module.exports = class ApiControls {
                   productOrder.productOrder.productName.split(']')[1],
                 date: productOrder.order.paymentDate,
               }
-              return returnVal
             })
           } else {
             orders = response.data.data.filter(function (productOrder) {
@@ -348,7 +344,7 @@ module.exports = class ApiControls {
               }
             })
           }
-          resolve(check(orders))
+          resolve(compareExOrderList(orders))
         })
         .catch(function (error) {
           log.error('getOrderList', error.response.data)
@@ -366,15 +362,20 @@ module.exports = class ApiControls {
     for (var i in pointList) {
       if (pointList[i].hasOwnProperty('bj')) {
         if (!scoreResult.hasOwnProperty(pointList[i].bj)) {
-          scoreResult[pointList[i].bj] = { plus: 0, minus: 0, quantity: 0 }
+          scoreResult[pointList[i].bj] = {
+            plus: 0,
+            minus: 0,
+            contribute: 0,
+            quantity: 0,
+          }
         }
 
         if (pointList[i].point == '플러스') {
-          scoreResult[pointList[i].bj].plus++
+          scoreResult[pointList[i].bj].plus += pointList[i].price
         } else if (pointList[i].point == '마이너스') {
-          scoreResult[pointList[i].bj].minus++
+          scoreResult[pointList[i].bj].minus += pointList[i].price
         }
-
+        scoreResult[pointList[i].bj].contribute += pointList[i].price
         scoreResult[pointList[i].bj].quantity += pointList[i].quantity
         scoreResult.total += pointList[i].quantity
       }
@@ -395,14 +396,14 @@ module.exports = class ApiControls {
     )
 
     orderList.forEach((element) => {
-      counterResult.TotalOrders++
+      counterResult.TotalOrders += element.quantity
       if (!counterResult.hasOwnProperty(element.productId)) {
         counterResult[element.productId] = { TotalCount: 0, PreCount: 0 }
       }
-      counterResult[element.productId].TotalCount++
+      counterResult[element.productId].TotalCount += element.quantity
       if (API.SALE_EVENT_CHECK) {
         if (API.SALE_EVENT_PRODUCT_ID == element.productId) {
-          counterResult[element.productId].PreCount++
+          counterResult[element.productId].PreCount += element.quantity
         }
       }
     })
@@ -420,11 +421,12 @@ module.exports = class ApiControls {
         'utf-8'
       )
     )
-    counterObj.TotalCount = orderList.length
+
     orderList.forEach((element) => {
+      counterObj.TotalCount += element.quantity
       if (API.SALE_EVENT_PRODUCT_ID) {
         if (API.SALE_EVENT_PRODUCT_ID == element.productId) {
-          counterObj.PreCount++
+          counterObj.PreCount += element.quantity
         }
       }
     })
@@ -441,14 +443,15 @@ module.exports = class ApiControls {
 
     for (var i in Object.keys(scoreboard)) {
       const score =
-        scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
-        scoreboard[Object.keys(scoreboard)[i]].minus * 100
-      const coutribute = scoreboard[Object.keys(scoreboard)[i]].quantity * 100
+        scoreboard[Object.keys(scoreboard)[i]].plus -
+        scoreboard[Object.keys(scoreboard)[i]].minus
+      const quantity = scoreboard[Object.keys(scoreboard)[i]].quantity
+      const coutribute = scoreboard[Object.keys(scoreboard)[i]].contribute
       var newObj = {
         name: Object.keys(scoreboard)[i],
         score: score,
         contribute: coutribute,
-        total: score + coutribute,
+        quantity: quantity,
       }
 
       result.push(newObj)
@@ -479,14 +482,15 @@ module.exports = class ApiControls {
 
     for (var i in Object.keys(scoreboard)) {
       const score =
-        scoreboard[Object.keys(scoreboard)[i]].plus * 100 -
-        scoreboard[Object.keys(scoreboard)[i]].minus * 100
-      const coutribute = scoreboard[Object.keys(scoreboard)[i]].quantity * 100
+        scoreboard[Object.keys(scoreboard)[i]].plus -
+        scoreboard[Object.keys(scoreboard)[i]].minus
+      const contribute = scoreboard[Object.keys(scoreboard)[i]].contribute
+      const quantity = scoreboard[Object.keys(scoreboard)[i]].quantity
       var newObj = {
         이름: Object.keys(scoreboard)[i],
         점수: score,
-        기여도: coutribute,
-        종합점수: score + coutribute,
+        기여도: contribute,
+        판매수량: quantity,
       }
       result.push(newObj)
     }

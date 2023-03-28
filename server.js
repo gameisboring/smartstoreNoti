@@ -128,6 +128,7 @@ app2.get('/scoreboard/result', async function (req, res) {
 app2.get('/scoreboard/get', async function (req, res) {
   log.info(`GET /scoreboard/get`)
   const dataList = await api.getScoreList()
+  res.json(dataList)
 })
 
 /* 설정 가져오기 */

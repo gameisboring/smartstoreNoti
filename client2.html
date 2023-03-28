@@ -803,7 +803,6 @@
       document.getElementById('SHOW_BJ_POINT').checked = !event.target.checked
       if (!event.target.checked) {
         document.querySelector('#nowSaleCountDiv').style.display = 'none'
-        saleEventProductId.value = ''
       } else {
         document.querySelector('#nowSaleCountDiv').style.display = 'block'
       }
@@ -815,6 +814,11 @@
         event.preventDefault()
         saleEventCheckbox.checked = !event.target.checked
         saleEventProductId.disabled = event.target.checked
+        if (!event.target.checked) {
+          document.querySelector('#nowSaleCountDiv').style.display = 'block'
+        } else {
+          document.querySelector('#nowSaleCountDiv').style.display = 'none'
+        }
       })
 
     var socket = io.connect('http://localhost:3000')
@@ -893,10 +897,15 @@
           document.getElementById('SHOW_BJ_POINT').checked = data.SHOW_BJ_POINT
           document.getElementById('SALE_EVENT_CHECK').checked =
             data.SALE_EVENT_CHECK
-          document.getElementById('SALE_EVENT_PRODUCT_ID').value =
-            data.SALE_EVENT_PRODUCT_ID
           document.getElementById('SALE_EVENT_PRODUCT_ID').disabled =
             !data.SALE_EVENT_CHECK
+          document.getElementById('SALE_EVENT_PRODUCT_ID').value =
+            data.SALE_EVENT_PRODUCT_ID
+          if (data.SALE_EVENT_CHECK) {
+            document.querySelector('#nowSaleCountDiv').style.display = 'block'
+          } else {
+            document.querySelector('#nowSaleCountDiv').style.display = 'none'
+          }
         })
     }
 
@@ -987,7 +996,7 @@
           SALE_EVENT_CHECK: document.getElementById('SALE_EVENT_CHECK').checked,
           SALE_EVENT_PRODUCT_ID: saleEventCheckbox.checked
             ? document.getElementById('SALE_EVENT_PRODUCT_ID').value
-            : null,
+            : '',
         }),
       })
 
@@ -1068,6 +1077,7 @@
           document.querySelector('#totalCount').innerText = data.TotalCount
         })
     }
+
     document
       .querySelector('#orderResult')
       .addEventListener('click', (event) => {
@@ -1075,7 +1085,6 @@
         fetch(`http://localhost:3000/order/result`)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.url)
             shell.openExternal(process.resourcesPath + '/list/' + data.url)
           })
       })
@@ -1087,7 +1096,6 @@
         fetch(`http://localhost:3000/scoreboard/result`)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.url)
             shell.openExternal(process.resourcesPath + '/list/' + data.url)
           })
       })
@@ -1177,7 +1185,6 @@
             SPEAKING_VOICE: document.querySelector('#SPEAKING_VOICE').value,
           }), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
         })
-        console.log(response)
         if (response.ok) {
           Toast.fire({
             icon: 'success',

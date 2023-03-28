@@ -10,13 +10,16 @@ async function callback() {
 }
 
 socket.on('scoreboard', (msg) => {
-  console.log(msg)
   var html = ''
+  var total = 0
   for (var i in msg.result) {
-    html += addListBar(msg.result[i], Number(i) + 1)
+    if (msg.result[i].name != '') {
+      html += addListBar(msg.result[i], Number(i) + 1)
+      total += msg.result[i].quantity
+    }
   }
   body.innerHTML = html
-  document.querySelector('#totalCount').innerText = msg.total
+  document.querySelector('#totalCount').innerText = total
 })
 
 socket.on('disconnect', (reason) => {
@@ -35,7 +38,7 @@ function addListBar(data, rank) {
     barImageFileName = 2
   } else if (rank == 3) {
     barImageFileName = 3
-  } else if (rank > 7) {
+  } else if (rank > 9) {
     barImageFileName = 'low'
   } else {
     barImageFileName = 'normal'
