@@ -3,10 +3,10 @@ var list = []
 var boardInfoReqInterval
 
 var body = document.querySelector('#main .body')
-socket.emit('getScoreboard', new Date().getTime())
+socket.emit('getScoreboard', new Date().toLocaleTimeString())
 
 async function callback() {
-  socket.emit('getScoreboard', new Date().getTime())
+  socket.emit('getScoreboard', new Date().toLocaleTimeString())
 }
 
 socket.on('scoreboard', (msg) => {

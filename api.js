@@ -9,7 +9,7 @@ const { createhashedSign } = require('./hash')
 const { dateFormat, hoursAgo } = require('./time')
 
 //  appdata/roaming/projectName
-let listFileUrl = process.resourcesPath + '/list'
+let listFolderUrl = process.resourcesPath + '/list'
 
 module.exports = class ApiControls {
   /**
@@ -20,17 +20,6 @@ module.exports = class ApiControls {
     const API = await JSON.parse(
       await fs.readFile(process.resourcesPath + '/APIconfig.json')
     )
-    /* log.info('req params', {
-      client_id: API.CLIENT_ID,
-      timestamp: new Date().getTime() - 3000,
-      client_secret_sign: await createhashedSign(
-        `${API.CLIENT_ID}_${new Date().getTime() - 3000}`,
-        API.CLIENT_SECRET
-      ),
-      grant_type: 'client_credentials',
-      type: 'SELF',
-      account_id: API.ACCOUNT_ID,
-    }) */
     return new Promise(async (resolve, reject) => {
       await axios({
         method: 'post',
@@ -67,21 +56,23 @@ module.exports = class ApiControls {
     const API = await JSON.parse(
       await fs.readFile(process.resourcesPath + '/APIconfig.json')
     )
+
+    // 클래스 객체
+    let apiControls = new ApiControls()
     // 2023-01-01_list.json
-    let listFileName = `/${dateFormat(hoursAgo(6))}_list.json`
-    let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
+    let listFileName = await this.getNewestList('_list.json')
+    let pointListFileName = await this.getNewestList('_pointList.json')
     // 새로운 주문 넣을 빈 배열
     let notiOrders = []
 
     // 기존에 작성되어있는 Array 타입 JSON 파일
     let orderedList = JSON.parse(
-      await fs.readFile(listFileUrl + listFileName, 'utf-8')
+      await fs.readFile(`${listFolderUrl}/${listFileName}`, 'utf-8')
     )
+
     let pointList = JSON.parse(
-      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
+      await fs.readFile(`${listFolderUrl}/${pointListFileName}`, 'utf-8')
     )
-    // 클래스 객체
-    let apiControls = new ApiControls()
 
     // 파라미터로 넘어온 데이터 순회하며 중복조회
     for (var i in mappedData) {
@@ -169,9 +160,12 @@ module.exports = class ApiControls {
     }
 
     // 리스트 파일로 저장
-    await fs.writeFile(listFileUrl + listFileName, JSON.stringify(orderedList))
     await fs.writeFile(
-      listFileUrl + pointListFileName,
+      `${listFolderUrl}/${listFileName}`,
+      JSON.stringify(orderedList)
+    )
+    await fs.writeFile(
+      `${listFolderUrl}/${pointListFileName}`,
       JSON.stringify(pointList)
     )
     // 순회 마치고 새롭게 추가된 데이터 반환
@@ -204,20 +198,18 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
-          // 3분 전
           lastChangedFrom: new Date(
             new Date().getTime() - (SALE_EVENT_CHECK ? 10000 : 180000)
           ),
-          // lastChangedFrom: new Date(new Date().toDateString()),
-          lastChangedType: 'PAYED',
         },
       })
         .then(async function (response) {
           var chekcData = response.data.hasOwnProperty('data')
           if (chekcData) {
-            const mappedData = response.data.data.lastChangeStatuses.map(
+            let mappedData = response.data.data.lastChangeStatuses.map(
               (change) => change.productOrderId
             )
+
             resolve(mappedData)
           } else {
             resolve(response.data)
@@ -354,11 +346,13 @@ module.exports = class ApiControls {
   }
 
   async getScoreList() {
-    let scoreResult = new Object({ total: 0 })
-    let pointListFileName = `/${dateFormat(hoursAgo(6))}_pointList.json`
     let pointList = JSON.parse(
-      await fs.readFile(listFileUrl + pointListFileName, 'utf-8')
+      await fs.readFile(
+        `${listFolderUrl}/${await this.getNewestList('pointList.json')}`,
+        'utf-8'
+      )
     )
+    let scoreResult = new Object({ total: 0 })
     for (var i in pointList) {
       if (pointList[i].hasOwnProperty('bj')) {
         if (!scoreResult.hasOwnProperty(pointList[i].bj)) {
@@ -390,7 +384,7 @@ module.exports = class ApiControls {
     )
     let orderList = JSON.parse(
       await fs.readFile(
-        listFileUrl + `/${dateFormat(hoursAgo(6))}_list.json`,
+        `${listFolderUrl}/${await this.getNewestList('list.json')}`,
         'utf-8'
       )
     )
@@ -412,12 +406,14 @@ module.exports = class ApiControls {
 
   async getCountForClient() {
     let counterObj = new Object({ TotalCount: 0, PreCount: 0 })
+
     const API = await JSON.parse(
       await fs.readFile(process.resourcesPath + '/APIconfig.json')
     )
+
     let orderList = JSON.parse(
       await fs.readFile(
-        listFileUrl + `/${dateFormat(hoursAgo(6))}_list.json`,
+        `${listFolderUrl}/${await this.getNewestList('list.json')}`,
         'utf-8'
       )
     )
@@ -430,6 +426,7 @@ module.exports = class ApiControls {
         }
       }
     })
+
     return counterObj
   }
 
@@ -508,5 +505,21 @@ module.exports = class ApiControls {
     }
 
     return { 결과: result, '총 판매수량': total }
+  }
+
+  async getNewestList(keyWord) {
+    return new Promise(async (resolve, reject) => {
+      await fs.readdir(listFolderUrl, 'utf-8', (err, files) => {
+        if (err) reject(err)
+        var count = 0
+        const newFiles = files.filter((file) => {
+          if (file.includes(keyWord)) {
+            count++
+            return true
+          }
+        })[--count]
+        resolve(newFiles)
+      })
+    })
   }
 }

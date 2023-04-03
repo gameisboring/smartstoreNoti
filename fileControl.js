@@ -55,16 +55,16 @@ module.exports = () => {
   //   check list file
   try {
     fs.readFileSync(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_list.json`
+      appResourcePath + '/list' + `/${dateFormat(new Date())}_list.json`
     )
   } catch {
-    log.info(`file writing .... ${dateFormat(hoursAgo(6))}_list.json`)
+    log.info(`file writing .... ${dateFormat(new Date())}_list.json`)
     fs.writeFile(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_list.json`,
+      appResourcePath + '/list' + `/${dateFormat(new Date())}_list.json`,
       '[]',
       () => {
         check.listFile =
-          appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_list.json`
+          appResourcePath + '/list' + `/${dateFormat(new Date())}_list.json`
       }
     )
   }
@@ -72,18 +72,18 @@ module.exports = () => {
   //   check point list file
   try {
     fs.readFileSync(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pointList.json`
+      appResourcePath + '/list' + `/${dateFormat(new Date())}_pointList.json`
     )
   } catch {
-    log.info(`file writing .... ${dateFormat(hoursAgo(6))}_pointList.json`)
+    log.info(`file writing .... ${dateFormat(new Date())}_pointList.json`)
     fs.writeFile(
-      appResourcePath + '/list' + `/${dateFormat(hoursAgo(6))}_pointList.json`,
+      appResourcePath + '/list' + `/${dateFormat(new Date())}_pointList.json`,
       '[]',
       () => {
         check.pointListFile =
           appResourcePath +
           '/list' +
-          `/${dateFormat(hoursAgo(6))}_pointList.json`
+          `/${dateFormat(new Date())}_pointList.json`
       }
     )
   }

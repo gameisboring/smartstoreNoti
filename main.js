@@ -3,27 +3,17 @@ const path = require('path')
 const { dateFormat, hoursAgo } = require('./time')
 const log = require('electron-log')
 log.transports.file.level = 'info'
-log.transports.file.fileName = dateFormat(hoursAgo(6)) + '.log'
+log.transports.file.fileName = dateFormat(new Date()) + '.log'
 var ipAdress = require('ip').address()
-
-/**
- * TODO
- * 1. 집계방식 다른걸로 api 함수 하나 더 만들기
- * 2. client html 작업
- * 3. 경로 ../Romaing 쪽에 있게 하지 말고 client resource 쪽으로 재설정하기
- * 4. TTS 음성 범위 재설정
- */
-
-// File control
-require('./fileControl')()
-
-log.info(ipAdress)
 
 // 애플리케이션 생명주기를 조작 하는 모듈.
 const { app } = electron
 var appResourcePath = process.resourcesPath
 // express 서버
 require('./server')
+require('./fileControl')()
+const api = require('./api')
+var { getNewestList } = new api()
 
 // 네이티브 브라우저 창을 만드는 모듈.
 const { BrowserWindow, Menu } = electron
@@ -57,7 +47,7 @@ function createWindow() {
   // 그리고 현재 디렉터리의 client.html을 로드합니다.
   win.loadURL(`file://${__dirname}/client2.html`)
   // 웹 페이지 로드 완료
-  win.webContents.on('did-finish-load', (evt) => {
+  win.webContents.on('did-finish-load', async (evt) => {
     // ipAddress 이벤트 송신
     win.webContents.send('ipAddress', ipAdress)
     // electron.app.getPath('appData') 송신
@@ -71,7 +61,7 @@ function createWindow() {
       path.join(
         process.resourcesPath,
         '/list',
-        dateFormat(hoursAgo(6)) + '_pointList.json'
+        await getNewestList('pointList.json')
       )
     )
 
@@ -80,7 +70,7 @@ function createWindow() {
       path.join(
         process.resourcesPath,
         '/list',
-        dateFormat(hoursAgo(6)) + '_list.json'
+        await getNewestList('list.json')
       )
     )
   })

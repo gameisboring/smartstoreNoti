@@ -12,8 +12,6 @@ const server = app2.listen(PORT, function () {
 app2.use(express.json())
 app2.use(express.urlencoded({ extended: false }))
 
-// var { quickStart } = require('./tts')
-
 const SocketIO = require('socket.io')
 const io = SocketIO(server, { path: '/socket.io' })
 module.exports = { io }
@@ -92,12 +90,12 @@ app2.get('/order/result', async function (req, res) {
     path.join(
       process.resourcesPath,
       '/list',
-      dateFormat(hoursAgo(6)) + '_result.json'
+      dateFormat(new Date()) + '_result.json'
     ),
     JSON.stringify(count),
     function () {
       res.json({
-        url: dateFormat(hoursAgo(6)) + '_result.json',
+        url: dateFormat(new Date()) + '_result.json',
       })
     }
   )
@@ -116,11 +114,11 @@ app2.get('/scoreboard/result', async function (req, res) {
     path.join(
       process.resourcesPath,
       '/list',
-      dateFormat(hoursAgo(6)) + '_pointResult.json'
+      dateFormat(new Date()) + '_pointResult.json'
     ),
     JSON.stringify(dataList),
     function () {
-      res.json({ url: dateFormat(hoursAgo(6)) + '_pointResult.json' })
+      res.json({ url: dateFormat(new Date()) + '_pointResult.json' })
     }
   )
 })

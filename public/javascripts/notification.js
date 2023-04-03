@@ -6,7 +6,7 @@ var notiInfoReqInterval = null
 var notiPopUpInterval = null
 
 async function notiReqCallback() {
-  socket.emit('getOrderList')
+  socket.emit('getOrderList', new Date().toLocaleTimeString())
 }
 
 socket.on('disconnect', function (reason) {
@@ -17,7 +17,7 @@ socket.on('disconnect', function (reason) {
 socket.on('connection', function (reason) {
   notiReqCallback()
   notiInfoReqInterval = setInterval(function () {
-    socket.emit('getOrderList')
+    socket.emit('getOrderList', new Date().toLocaleTimeString())
   }, 4000)
 
   notiPopUpInterval = setTimeout(tick, 100)
@@ -35,7 +35,7 @@ socket.on('resume', function (msg) {
   console.log(msg)
   Swal.resumeTimer()
   notiInfoReqInterval = setInterval(function () {
-    socket.emit('getOrderList')
+    socket.emit('getOrderList', new Date().toLocaleTimeString())
   }, 4000)
 
   notiPopUpInterval = setTimeout(tick, 100)
