@@ -6,25 +6,115 @@
   font-style: normal;
 }
 
-* {
+.swal2-container {
+  background: rgba(0, 0, 0, 0);
+  overflow-y: auto;
+  display: grid;
+  position: fixed;
+  z-index: 1060;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  align-items: center;
+  height: 100%;
+  padding: 0.625em;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.swal2-popup {
+  background: transparent;
+  position: relative;
+  top: 20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  grid-template-columns: minmax(0, 100%);
+  width: 32em;
+  max-width: 100%;
+  padding: 0 0 1.25em;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 0 0px rgba(0, 0, 0, 0);
+}
+
+/* 전체 텍스트 설정 */
+.swal2-title {
+  background: rgba(0, 0, 0, 0);
   text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000;
+  color: #716add;
+  font-size: 30px;
   font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
+  text-align: center;
+
+  text-transform: none;
+  word-wrap: break-word;
+
+  display: block;
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.8em 1em 0;
 }
 
-.msgText {
+/* 알림 이미지 관련 설정 */
+.swal2-image {
+  margin: 2em auto 1em auto;
+
+  max-width: 100%;
+  width: auto;
+
+  max-height: 100%;
+  height: 300px;
+
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 구매 메세지 관련 설정 */
+.text {
   font-size: 28px;
+  font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
+  color: inherit;
 }
-
+/* 닉네임 */
 .nick {
+  font-size: 30px;
+  font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
   color: white;
 }
+/* 수량 */
 .quantity {
+  font-size: 30px;
+  font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
   color: white;
 }
+/* 상품명 */
 .productName {
+  font-size: 30px;
+  font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
   color: white;
 }
+/* 플마 */
 .point {
   font-size: 45px;
+  font-family: 'KCC-Ganpan';
+  font-weight: 600;
+  font-style: normal;
   color: red;
 }

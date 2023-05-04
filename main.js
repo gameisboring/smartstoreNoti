@@ -32,7 +32,7 @@ function createWindow() {
   // 새로운 브라우저 창을 생성합니다.
   win = new BrowserWindow({
     width: 800,
-    height: 886,
+    height: 950,
     resizable: false,
     useContentSize: true,
     titleBarStyle: 'hiddenInset',

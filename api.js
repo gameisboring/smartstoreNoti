@@ -1,16 +1,16 @@
 'use strict'
 
-const fs = require('fs').promises
+const fsPromises = require('fs').promises
+const fs = require('fs')
 const axios = require('axios').default
 const { io } = require('./server')
 const log = require('electron-log')
-
+const path = require('path')
 const { createhashedSign } = require('./hash')
 const { dateFormat, hoursAgo } = require('./time')
 
 //  appdata/roaming/projectName
 let listFolderUrl = process.resourcesPath + '/list'
-
 module.exports = class ApiControls {
   /**
    * Get Access Token from NaverCommerce API Center with Axios
@@ -18,7 +18,7 @@ module.exports = class ApiControls {
    */
   async getOauthTokenToAxios() {
     const API = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
     return new Promise(async (resolve, reject) => {
       await axios({
@@ -54,24 +54,27 @@ module.exports = class ApiControls {
    */
   async compareExOrderList(mappedData) {
     const API = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
 
     // 클래스 객체
     let apiControls = new ApiControls()
     // 2023-01-01_list.json
-    let listFileName = await this.getNewestList('_list.json')
-    let pointListFileName = await this.getNewestList('_pointList.json')
+    let listFileName = await apiControls.getNewestList('_list.json')
+    let pointListFileName = await apiControls.getNewestList('_pointList.json')
     // 새로운 주문 넣을 빈 배열
     let notiOrders = []
 
     // 기존에 작성되어있는 Array 타입 JSON 파일
     let orderedList = JSON.parse(
-      await fs.readFile(`${listFolderUrl}/${listFileName}`, 'utf-8')
+      await fsPromises.readFile(`${listFolderUrl}/${listFileName}`, 'utf-8')
     )
 
     let pointList = JSON.parse(
-      await fs.readFile(`${listFolderUrl}/${pointListFileName}`, 'utf-8')
+      await fsPromises.readFile(
+        `${listFolderUrl}/${pointListFileName}`,
+        'utf-8'
+      )
     )
 
     // 파라미터로 넘어온 데이터 순회하며 중복조회
@@ -160,11 +163,11 @@ module.exports = class ApiControls {
     }
 
     // 리스트 파일로 저장
-    await fs.writeFile(
+    await fsPromises.writeFile(
       `${listFolderUrl}/${listFileName}`,
       JSON.stringify(orderedList)
     )
-    await fs.writeFile(
+    await fsPromises.writeFile(
       `${listFolderUrl}/${pointListFileName}`,
       JSON.stringify(pointList)
     )
@@ -182,7 +185,7 @@ module.exports = class ApiControls {
   async getChangeList() {
     const oauthToken = await this.getOauthTokenToAxios()
     const { SALE_EVENT_CHECK } = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
     if (!oauthToken) {
       return false
@@ -227,7 +230,7 @@ module.exports = class ApiControls {
    */
   async getOrderList() {
     const API = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
     const RegexObj = {
       nick: new RegExp(`(?<=${API.NICK_OPT}: )(.*?)(?= \/)`),
@@ -347,7 +350,7 @@ module.exports = class ApiControls {
 
   async getScoreList() {
     let pointList = JSON.parse(
-      await fs.readFile(
+      await fsPromises.readFile(
         `${listFolderUrl}/${await this.getNewestList('pointList.json')}`,
         'utf-8'
       )
@@ -380,10 +383,10 @@ module.exports = class ApiControls {
   async getCountForAdmin() {
     let counterResult = new Object({ TotalOrders: 0 })
     const API = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
     let orderList = JSON.parse(
-      await fs.readFile(
+      await fsPromises.readFile(
         `${listFolderUrl}/${await this.getNewestList('list.json')}`,
         'utf-8'
       )
@@ -408,11 +411,11 @@ module.exports = class ApiControls {
     let counterObj = new Object({ TotalCount: 0, PreCount: 0 })
 
     const API = await JSON.parse(
-      await fs.readFile(process.resourcesPath + '/APIconfig.json')
+      await fsPromises.readFile(process.resourcesPath + '/APIconfig.json')
     )
 
     let orderList = JSON.parse(
-      await fs.readFile(
+      await fsPromises.readFile(
         `${listFolderUrl}/${await this.getNewestList('list.json')}`,
         'utf-8'
       )
@@ -509,16 +512,18 @@ module.exports = class ApiControls {
 
   async getNewestList(keyWord) {
     return new Promise(async (resolve, reject) => {
-      await fs.readdir(listFolderUrl, 'utf-8', (err, files) => {
+      await fsPromises.readdir(listFolderUrl, 'utf-8', (err, files) => {
         if (err) reject(err)
-        var count = 0
-        const newFiles = files.filter((file) => {
-          if (file.includes(keyWord)) {
-            count++
-            return true
-          }
-        })[--count]
-        resolve(newFiles)
+
+        files = files
+          .filter((file) => file.includes(keyWord))
+          .map((file) => ({
+            file,
+            mtime: fs.lstatSync(path.join(listFolderUrl, file)).mtime,
+          }))
+          .sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
+
+        resolve(files[0].file)
       })
     })
   }

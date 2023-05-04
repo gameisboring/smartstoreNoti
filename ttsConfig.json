@@ -9,5 +9,6 @@
   "SECOND_SOUND_FILE": "second.mp3",
   "THIRD_SOUND_FILE": "third.mp3",
   "SPEAKING_RATE": 1.0,
-  "SPEAKING_VOICE": "ko-KR-Standard-A"
+  "SPEAKING_VOICE": "ko-KR-Standard-A",
+  "DIALOG_FORM": "[nick]님 [productName] [quantity]개 구매 감사합니다. [bj] [point] [text]"
 }

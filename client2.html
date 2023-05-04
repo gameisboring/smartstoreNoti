@@ -68,7 +68,7 @@
         top: 0;
         margin: 0;
         background: #000000;
-        height: 836px;
+        height: 900px;
       }
       .tabs::before,
       .tabs::after {
@@ -361,6 +361,11 @@
         cursor: pointer;
       }
 
+      #DIALOG_FORM {
+        font-size: 18px;
+        line-height: 26px;
+        text-align: left;
+      }
       .flex-col {
         display: flex;
         flex-direction: column;
@@ -603,10 +608,11 @@
                     display: flex;
                     width: 100%;
                     justify-content: space-around;
+                    align-items: flex-end;
                   "
                 >
                   <div class="flex-col">
-                    <div class="shortInput" style="justify-content: center">
+                    <div class="shortInput">
                       음성 속도
                       <input
                         type="number"
@@ -616,10 +622,11 @@
                         value="1.0"
                       />
                     </div>
-                    <div class="shortInput" style="justify-content: center">
+                    <div class="shortInput">
                       음성 종류<select
                         name="SPEAKING_VOICE"
                         id="SPEAKING_VOICE"
+                        style="font-size: 24px"
                       >
                         <option value="ko-KR-Standard-A" selected>
                           여성 A
@@ -631,8 +638,29 @@
                       <button id="sampleAudioPlay">🔊</button>
                       <audio id="sampleAudio"></audio>
                     </div>
+                    <div class="shortInput">
+                      알림 텍스트
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: column;
+                          font-size: 12px;
+                          line-height: 18px;
+                        "
+                      >
+                        <textarea
+                          id="DIALOG_FORM"
+                          name="DIALOG_FORM"
+                        ></textarea>
+                        <span> * 오타 주의 * </span>
+                        <span
+                          >[nick] 닉네임 / [productName] 상품명 / [qunatity]
+                          수량
+                        </span>
+                        <span>[bj] BJ / [point] 플마 / [text] 구매메세지</span>
+                      </div>
+                    </div>
                   </div>
-
                   <button class="saveBtn" id="speakConfig">저장</button>
                 </div>
               </fieldset>
@@ -934,6 +962,7 @@
             data.SPEAKING_RATE
           )
           document.querySelector('#SPEAKING_VOICE').value = data.SPEAKING_VOICE
+          document.querySelector('#DIALOG_FORM').value = data.DIALOG_FORM
         })
     }
 
@@ -1183,6 +1212,7 @@
           body: JSON.stringify({
             SPEAKING_RATE: document.querySelector('#SPEAKING_RATE').value,
             SPEAKING_VOICE: document.querySelector('#SPEAKING_VOICE').value,
+            DIALOG_FORM: document.querySelector('#DIALOG_FORM').value,
           }), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
         })
         if (response.ok) {

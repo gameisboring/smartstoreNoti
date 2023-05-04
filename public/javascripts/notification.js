@@ -54,6 +54,31 @@ socket.on('orderList', function (msg) {
     return
   }
 })
+function tssDialogGen(data, script) {
+  var reqUrl = script
+  Object.keys(data).forEach(function (key) {
+    reqUrl = reqUrl.replace('[' + key + ']', data[key])
+  })
+  return reqUrl
+}
+
+function alertTextGen(data, script) {
+  var text = script.replace(/\./g, ' ')
+  Object.keys(data).forEach(function (key) {
+    if (key == 'text' || key == 'bj' || key == 'productName') {
+      text = text.replace(
+        '[' + key + ']',
+        `<br><span class="${key}">${data[key]}</span>`
+      )
+    } else {
+      text = text.replace(
+        '[' + key + ']',
+        `<span class="${key}">${data[key]}</span>`
+      )
+    }
+  })
+  return text
+}
 
 async function tick() {
   console.log('남은 주문 : ' + list.length + '개')
@@ -61,17 +86,11 @@ async function tick() {
   if (list.length > 0) {
     const el = list.shift()
     var notiSound = new Audio()
-
-    var reqUrl = `http://nstream.kr:1322/${el.nick ? el.nick + '님' : ''}. ${
-      el.productName ? el.productName : ''
-    } ${el.quantity ? el.quantity + '개' : ''} 구매 감사합니다..
-    ${el.bj ? el.bj : ''}${el.point ? el.point + '..' : ''} ${
-      el.text ? el.text : ''
-    }`
-
+    var notiText = ''
+    var reqUrl = 'http://nstream.kr:1322/'
     await fetch('/config/tts')
       .then((response) => response.json())
-      .then((data) => {
+      .then(async (data) => {
         if (
           Number(el.quantity) >= Number(data.FIRST_SOUND_UP) &&
           Number(el.quantity) <= Number(data.FIRST_SOUND_DOWN)
@@ -87,11 +106,11 @@ async function tick() {
         } else {
           return
         }
-
+        notiText = await alertTextGen(el, data.DIALOG_FORM)
+        reqUrl += await tssDialogGen(el, data.DIALOG_FORM)
         reqUrl += '/' + data.SPEAKING_RATE + '/' + data.SPEAKING_VOICE
       })
 
-    console.log(reqUrl)
     var notiTextToSpeach = new Audio(reqUrl)
 
     notiSound.load()
@@ -106,23 +125,12 @@ async function tick() {
         notiPopUpInterval = setTimeout(tick, timer)
 
         Swal.fire({
-          title: `<span class="nick">${el.nick}</span>님
-        <span class="productName">${
-          el.productName
-        }</span> <span class="quantity">${el.quantity}</span>개
-        구매 감사합니다
-        ${el.bj ? '<span class="point">' + el.bj + '</span>' : ''} ${
-            el.point ? '<span class="point">' + el.point + '</span>' : ''
-          } `,
-          html: `<span class="msgText">${el.text}</span>`,
+          title: notiText,
           timer: timer,
           // timerProgressBar: true,
           imageUrl: '/images/noti.png',
-          imageHeight: 300,
           imageAlt: 'A image',
-          color: '#716add',
           showConfirmButton: false,
-          background: 'transparent',
           backdrop: `rgba(0,0,0,0.0)`,
           didOpen: async () => {
             notiSound.play()
@@ -133,7 +141,6 @@ async function tick() {
           },
         }).then((result) => {
           if (result.dismiss === Swal.DismissReason.timer) {
-            console.log('I was closed by the timer')
           }
         })
       }

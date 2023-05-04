@@ -204,6 +204,7 @@ app2.post('/config/speak', (req, res, next) => {
       )
       data.SPEAKING_RATE = obj.SPEAKING_RATE
       data.SPEAKING_VOICE = obj.SPEAKING_VOICE
+      data.DIALOG_FORM = obj.DIALOG_FORM
       fs.writeFile(
         process.resourcesPath + '/ttsConfig.json',
         JSON.stringify(data),
