@@ -458,8 +458,6 @@ module.exports = class ApiControls {
     }
 
     result.sort(function (a, b) {
-      if (a.score > b.score) return -1
-      if (a.score < b.score) return 1
       if (a.contribute > b.contribute) return -1
       if (a.contribute < b.contribute) return 1
       return 0

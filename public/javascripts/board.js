@@ -18,7 +18,7 @@ socket.on('scoreboard', (msg) => {
       total += msg.result[i].quantity
     }
   }
-  body.innerHTML = html
+  body.innerHTML = html8
   document.querySelector('#totalCount').innerText = total
 })
 
@@ -49,7 +49,6 @@ function addListBar(data, rank) {
   <div class="barText menu">
     <span class="rank">${rank}</span>
     <span class="bj">${data.name}</span>
-    <span class="score">${data.score}</span>
     <span class="contribute">${data.contribute}</span>
   </div>
 </div>`

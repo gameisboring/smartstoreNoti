@@ -65,11 +65,18 @@ img {
 
   bottom: 31px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 800;
   font-style: normal;
   font-stretch: normal;
   line-height: 30px;
+}
+
+.white {
   color: white;
+}
+
+.black {
+  color: black;
 }
 
 .bar .barText.menu {
@@ -88,7 +95,7 @@ img {
 }
 
 .bar .barText .bj {
-  flex-grow: 1.4;
+  flex-grow: 2.4;
 }
 
 .bar .barText .score {

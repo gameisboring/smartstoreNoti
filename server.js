@@ -108,7 +108,7 @@ app2.get('/scoreboard', async function (req, res) {
 })
 
 app2.get('/scoreboard/result', async function (req, res) {
-  log.info(`GET /scoreboard`)
+  log.info(`GET /scoreboard/result`)
   const dataList = await api.scoreBoardResult()
   fs.writeFile(
     path.join(
