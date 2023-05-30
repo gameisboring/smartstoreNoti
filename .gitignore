@@ -8,3 +8,4 @@
 config/ApiConfig.json
 example.js
 /public/tts-api-account.json
+/public/font/*

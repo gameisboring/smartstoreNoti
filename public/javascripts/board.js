@@ -18,7 +18,7 @@ socket.on('scoreboard', (msg) => {
       total += msg.result[i].quantity
     }
   }
-  body.innerHTML = html8
+  body.innerHTML = html
   document.querySelector('#totalCount').innerText = total
 })
 

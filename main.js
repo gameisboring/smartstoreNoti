@@ -20,7 +20,7 @@ const { BrowserWindow, Menu } = electron
 
 log.info('program directory', appResourcePath)
 // 메뉴 끄기
-Menu.setApplicationMenu(false)
+// Menu.setApplicationMenu(false)
 // 하드웨어 가속 끄기
 app.disableHardwareAcceleration()
 

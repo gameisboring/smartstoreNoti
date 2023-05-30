@@ -1164,6 +1164,8 @@
         event.preventDefault()
         const inputs = event.target.querySelectorAll('input')
         const formData = new Object()
+        console.log('test')
+        socket.emit('test', 'this is test message')
 
         for (var i = 0; i < inputs.length; i++) {
           formData[inputs[i].name] = inputs[i].value

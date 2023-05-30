@@ -56,6 +56,10 @@ socket.on('orderList', function (msg) {
   console.log('order', list.length, msg)
 })
 
+socket.on('test', function (msg) {
+  console.log(msg)
+})
+
 function tssDialogGen(data, script) {
   var reqUrl = script
   Object.keys(data).forEach(function (key) {

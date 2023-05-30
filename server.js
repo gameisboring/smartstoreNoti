@@ -302,6 +302,10 @@ io.on('connection', function (socket) {
     log.info('getScoreboard', msg)
     socket.emit('scoreboard', await api.scoreBoardToUsableData())
   })
+
+  socket.on('test', function (msg) {
+    socket.emit('test', msg)
+  })
 })
 
 module.exports = app2

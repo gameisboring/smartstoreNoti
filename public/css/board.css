@@ -1,3 +1,24 @@
+@font-face {
+  font-family: 'ChosunLo';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunLo.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NanumSquareNeo-Heavy';
+  src: url('../font/NanumSquareNeoTTF-eHv.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'NanumSquareNeo-Bold';
+  src: url('../font/NanumSquareNeoTTF-cBd.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
 body {
   margin-left: 100px;
   margin-right: 0px;
@@ -49,7 +70,7 @@ img {
 
 .bar img {
   margin: 5px auto;
-  height: 25px;
+  height: 30px;
   width: 100%;
   display: block;
   padding: 0;
@@ -65,10 +86,14 @@ img {
 
   bottom: 31px;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   line-height: 30px;
+}
+
+.bar .barText.top span {
+  font-size: 16px !important;
 }
 
 .white {
@@ -84,6 +109,8 @@ img {
   bottom: 32px;
   padding: 0;
   text-align: center;
+  align-content: center;
+  line-height: 26px;
 }
 
 .bar .barText.menu span {
@@ -91,19 +118,25 @@ img {
 }
 
 .bar .barText .rank {
-  flex-grow: 0.5;
+  flex-grow: 0.6;
+  font-family: 'ChosunLo';
+  font-size: 25px;
 }
 
 .bar .barText .bj {
-  flex-grow: 2.4;
+  flex-grow: 2.2;
+  font-family: 'NanumSquareNeo-Heavy';
+  font-weight: 900;
 }
 
-.bar .barText .score {
+/* .bar .barText .score {
   flex-grow: 1;
-}
+} */
 
 .bar .barText .contribute {
-  flex-grow: 1;
+  flex-grow: 2;
+  font-family: 'NanumSquareNeo-Bold';
+  font-weight: 800;
 }
 
 .footer {
@@ -124,21 +157,34 @@ img {
 }
 
 .footer .barText.footer span {
-  font-size: 25px;
-  font-weight: 700;
+  font-weight: 500;
   font-style: normal;
-  font-stretch: normal;
-  line-height: 35px;
   color: black;
+  font-family: 'ChosunLo';
+  font-size: 25px;
+}
+
+.footer .barText.footer .each {
+  /* position: relative; */
+  /* left: 40px; */
+  font-size: 20px;
+  float: right;
 }
 
 .footer .barText.footer .total {
-  border: 3px solid black;
+  width: 180px;
+  border: 2px solid black;
   height: 35px;
-  line-height: 35px;
-  display: flex;
-  justify-content: space-around;
-  padding: 0 20px;
+  line-height: 36px;
+  /* display: flex;
+  justify-content: center; */
+  font-stretch: 90%;
   margin: 0;
   min-width: 100px;
+  text-align: center;
+  padding: 0 3px;
+}
+
+#totalCount {
+  font-size: 38px;
 }
