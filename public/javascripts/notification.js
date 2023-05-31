@@ -91,8 +91,11 @@ async function tick() {
 
   if (list.length > 0) {
     const el = list.shift()
+    console.log(el)
     var notiSound = new Audio()
     var notiText = ''
+    var ttsReady = false
+    var soundReady = false
     var reqUrl = 'http://nstream.kr:1322/'
     await fetch('/config/tts')
       .then((response) => response.json())
@@ -123,16 +126,30 @@ async function tick() {
     notiTextToSpeach.load()
 
     notiSound.onloadedmetadata = function () {
-      notiTextToSpeach.onloadedmetadata = function () {
+      soundReady = true
+      checkBothAudiosReady()
+    }
+    notiTextToSpeach.onloadedmetadata = function () {
+      ttsReady = true
+      checkBothAudiosReady()
+    }
+
+    function checkBothAudiosReady() {
+      if (soundReady && ttsReady) {
+        console.log('both audios are Ready')
+        console.log(notiSound.duration)
+        console.log(notiTextToSpeach.duration)
+
         var timer =
           Math.floor(notiSound.duration * 1000) +
           Math.floor(notiTextToSpeach.duration * 1000) +
           2000
+
         notiPopUpInterval = setTimeout(tick, timer)
 
         Swal.fire({
           title: notiText,
-          timer: timer,
+          timer: timer - 1000,
           // timerProgressBar: true,
           imageUrl: '/images/noti.png',
           imageAlt: 'A image',

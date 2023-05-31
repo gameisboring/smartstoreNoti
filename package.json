@@ -1,6 +1,6 @@
 {
   "name": "smartstorenoti",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "smartstore에서 구매기록을 가져오는 프로그램 입니다",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "deploy:mac": "electron-builder --mac"
   },
   "build": {
-    "productName": "Smart Store Alarm 1.4.1",
+    "productName": "Smart Store Alarm 1.4.2",
     "appId": "com.electron.hello",
     "asar": true,
     "protocols": {

@@ -192,6 +192,22 @@ module.exports = class ApiControls {
     }
 
     return new Promise((resolve, reject) => {
+      async function getMore(moreFrom, moreSequence) {
+        return await axios({
+          method: 'get',
+          url: '/external/v1/pay-order/seller/product-orders/last-changed-statuses',
+          baseURL: 'https://api.commerce.naver.com',
+          headers: {
+            Authorization: oauthToken,
+            'content-type': 'application/json',
+          },
+          params: {
+            lastChangedFrom: moreFrom,
+            moreSequence: moreSequence,
+          },
+        })
+      }
+
       axios({
         method: 'get',
         url: '/external/v1/pay-order/seller/product-orders/last-changed-statuses',
@@ -201,6 +217,7 @@ module.exports = class ApiControls {
           'content-type': 'application/json',
         },
         params: {
+          // lastChangedFrom: new Date('2023-05-31'),
           lastChangedFrom: new Date(
             new Date().getTime() - (SALE_EVENT_CHECK ? 10000 : 180000)
           ),
@@ -212,7 +229,18 @@ module.exports = class ApiControls {
             let mappedData = response.data.data.lastChangeStatuses.map(
               (change) => change.productOrderId
             )
-
+            if (response.data.data.hasOwnProperty('more')) {
+              var more = await getMore(
+                response.data.data.more.moreFrom,
+                response.data.data.more.moreSequence
+              ).then(async function (response) {
+                let mappedData = response.data.data.lastChangeStatuses.map(
+                  (change) => change.productOrderId
+                )
+                return mappedData
+              })
+              mappedData = mappedData.concat(more)
+            }
             resolve(mappedData)
           } else {
             resolve(response.data)
