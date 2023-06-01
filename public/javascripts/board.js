@@ -49,7 +49,7 @@ function addListBar(data, rank) {
   <div class="barText menu">
     <span class="rank">${rank}</span>
     <span class="bj">${data.name}</span>
-    <span class="contribute">${data.contribute}</span>
+    <span class="contribute">${data.quantity}</span>
   </div>
 </div>`
 

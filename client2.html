@@ -511,6 +511,7 @@
                           name="soundFile"
                           id="FIRST_SOUND_FILE"
                           accept="audio/*"
+                          required
                         />
                       </div>
                     </div>
@@ -540,12 +541,8 @@
                         <div>
                           현재 사운드 <span id="SECOND_SOUND_FILE_NAME"></span>
                         </div>
-                        <input
-                          type="file"
-                          name="soundFile"
-                          id="SECOND_SOUND_FILE"
-                          accept="audio/*"
-                        />
+                        <input type="file" name="soundFile"
+                        id="SECOND_SOUND_FILE" accept="audio/*" required= />
                       </div>
                     </div>
                   </fieldset>
@@ -581,6 +578,7 @@
                           name="soundFile"
                           id="THIRD_SOUND_FILE"
                           accept="audio/*"
+                          required
                         />
                       </div>
                     </div>
@@ -1059,6 +1057,7 @@
           formData.append(numInput[i].name, '')
         }
       }
+
       for (var i = 0; i < hiddenInput.length; i++) {
         if (hiddenInput[i].value) {
           formData.append(hiddenInput[i].name, hiddenInput[i].value)

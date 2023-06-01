@@ -174,12 +174,26 @@ app2.post('/config/tts', SoundUpload.array('soundFile'), (req, res, next) => {
   let obj = JSON.parse(JSON.stringify(req.body))
   if (req.body) {
     try {
+      let data = JSON.parse(
+        fs.readFileSync(process.resourcesPath + '/ttsConfig.json', 'utf-8')
+      )
+
+      data.FIRST_SOUND_UP = obj.FIRST_SOUND_UP
+      data.FIRST_SOUND_DOWN = obj.FIRST_SOUND_DOWN
+      data.SECOND_SOUND_UP = obj.SECOND_SOUND_UP
+      data.SECOND_SOUND_DOWN = obj.SECOND_SOUND_DOWN
+      data.THIRD_SOUND_UP = obj.THIRD_SOUND_UP
+      data.THIRD_SOUND_DOWN = obj.THIRD_SOUND_DOWN
+      data.FIRST_SOUND_FILE = obj.FIRST_SOUND_FILE
+      data.SECOND_SOUND_FILE = obj.SECOND_SOUND_FILE
+      data.THIRD_SOUND_FILE = obj.THIRD_SOUND_FILE
+
       fs.writeFile(
         process.resourcesPath + '/ttsConfig.json',
-        JSON.stringify(obj),
+        JSON.stringify(data),
         'utf-8',
         () => {
-          log.info('알림 설정 변경', JSON.stringify(obj))
+          log.info('알림 조건 설정 변경', JSON.stringify(obj))
           res.status(200).send({
             ok: true,
           })
@@ -210,7 +224,7 @@ app2.post('/config/speak', (req, res, next) => {
         JSON.stringify(data),
         'utf-8',
         () => {
-          log.info('알림 설정 변경', JSON.stringify(obj))
+          log.info('TTS Voice 설정 변경', JSON.stringify(obj))
           res.status(200).send({
             ok: true,
           })

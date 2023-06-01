@@ -144,9 +144,11 @@ module.exports = class ApiControls {
           )
         }
 
-        if (mappedData[i].bj && mappedData[i].point) {
-          notiOrders.push(mappedData[i])
-        }
+        // 이거 왜 넣었지
+        // if (mappedData[i].bj && mappedData[i].point) {
+        //
+        // }
+        notiOrders.push(mappedData[i])
 
         pointList.push({
           no: pointList.length,
@@ -486,8 +488,8 @@ module.exports = class ApiControls {
     }
 
     result.sort(function (a, b) {
-      if (a.contribute > b.contribute) return -1
-      if (a.contribute < b.contribute) return 1
+      if (a.quantity > b.quantity) return -1
+      if (a.quantity < b.quantity) return 1
       return 0
     })
 
@@ -522,10 +524,8 @@ module.exports = class ApiControls {
     }
 
     result.sort(function (a, b) {
-      if (a.점수 > b.점수) return -1
-      if (a.점수 < b.점수) return 1
-      if (a.기여도 > b.기여도) return -1
-      if (a.기여도 < b.기여도) return 1
+      if (a.판매수량 > b.판매수량) return -1
+      if (a.판매수량 < b.판매수량) return 1
       return 0
     })
 
