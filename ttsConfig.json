@@ -1,14 +1,1 @@
-{
-  "FIRST_SOUND_UP": "1",
-  "FIRST_SOUND_DOWN": "4",
-  "SECOND_SOUND_UP": "5",
-  "SECOND_SOUND_DOWN": "9",
-  "THIRD_SOUND_UP": "10",
-  "THIRD_SOUND_DOWN": "100",
-  "FIRST_SOUND_FILE": "first.mp3",
-  "SECOND_SOUND_FILE": "second.mp3",
-  "THIRD_SOUND_FILE": "third.mp3",
-  "SPEAKING_RATE": 1,
-  "SPEAKING_VOICE": "ko-KR-Standard-A",
-  "DIALOG_FORM": "[nick]님 [productName] [quantity]개 구매 감사합니다. [text]"
-}
+{"FIRST_SOUND_UP":"1","FIRST_SOUND_DOWN":"4","SECOND_SOUND_UP":"5","SECOND_SOUND_DOWN":"9","THIRD_SOUND_UP":"10","THIRD_SOUND_DOWN":"100","FIRST_SOUND_FILE":"first.mp3","SECOND_SOUND_FILE":"second.mp3","THIRD_SOUND_FILE":"third.mp3","SPEAKING_RATE":"1.1","SPEAKING_VOICE":"ko-KR-Standard-A","DIALOG_FORM":"[bj] 의 팬 [nick] 님 [quantity] 개. [text]"}

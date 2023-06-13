@@ -1,20 +1,20 @@
 @font-face {
-  font-family: 'ChosunLo';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunLo.woff')
-    format('woff');
+  font-family: "ChosunLo";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunLo.woff")
+    format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'NanumSquareNeo-Heavy';
-  src: url('../font/NanumSquareNeoTTF-eHv.woff2') format('woff2');
+  font-family: "NanumSquareNeo-Heavy";
+  src: url("../font/NanumSquareNeoTTF-eHv.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
-  font-family: 'NanumSquareNeo-Bold';
-  src: url('../font/NanumSquareNeoTTF-cBd.woff2') format('woff2');
+  font-family: "NanumSquareNeo-Bold";
+  src: url("../font/NanumSquareNeoTTF-cBd.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
 }
@@ -57,9 +57,10 @@ img {
 }
 
 .bar {
-  background-image: url('../images/barBack.png');
+  /* margin-left: 1px; */
+  background-image: url("../images/barBack.png");
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   font-weight: 700;
   height: 30px;
   padding-left: 13px;
@@ -92,6 +93,10 @@ img {
   line-height: 30px;
 }
 
+#main .body {
+  width: 100%;
+}
+
 .bar .barText.top span {
   font-size: 16px !important;
 }
@@ -119,13 +124,13 @@ img {
 
 .bar .barText .rank {
   flex-grow: 0.6;
-  font-family: 'ChosunLo';
+  font-family: "ChosunLo";
   font-size: 25px;
 }
 
 .bar .barText .bj {
   flex-grow: 2.2;
-  font-family: 'NanumSquareNeo-Heavy';
+  font-family: "NanumSquareNeo-Heavy";
   font-weight: 900;
 }
 
@@ -135,7 +140,7 @@ img {
 
 .bar .barText .contribute {
   flex-grow: 2;
-  font-family: 'NanumSquareNeo-Bold';
+  font-family: "NanumSquareNeo-Bold";
   font-weight: 800;
 }
 
@@ -160,7 +165,7 @@ img {
   font-weight: 500;
   font-style: normal;
   color: black;
-  font-family: 'ChosunLo';
+  font-family: "ChosunLo";
   font-size: 25px;
 }
 

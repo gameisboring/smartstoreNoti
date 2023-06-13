@@ -1,7 +1,7 @@
 @font-face {
-  font-family: 'KCC-Ganpan';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/KCC-Ganpan.woff2')
-    format('woff2');
+  font-family: "NanumSquareRound";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff")
+    format("woff");
   font-weight: normal;
   font-style: normal;
 }
@@ -37,17 +37,36 @@
   max-width: 100%;
   padding: 0 0 1.25em;
   border: none;
-  border-radius: 5px;
+  border-radius: 0px;
   box-shadow: 0 0 0px rgba(0, 0, 0, 0);
 }
 
 /* 전체 텍스트 설정 */
 .swal2-title {
   background: rgba(0, 0, 0, 0);
-  text-shadow: -2px 0 #000, 0 2px #000, 2px 0 #000, 0 -2px #000;
-  color: #716add;
+  text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.8),
+    -1px -0.5px 0px rgba(0, 0, 0, 0.8), -1px 0px 0px rgba(0, 0, 0, 0.8),
+    -1px 0.5px 0px rgba(0, 0, 0, 0.8), -1px 1px 0px rgba(0, 0, 0, 0.8),
+    -1px 1.5px 0px rgba(0, 0, 0, 0.8), -0.5px -1px 0px rgba(0, 0, 0, 0.8),
+    -0.5px -0.5px 0px rgba(0, 0, 0, 0.8), -0.5px 0px 0px rgba(0, 0, 0, 0.8),
+    -0.5px 0.5px 0px rgba(0, 0, 0, 0.8), -0.5px 1px 0px rgba(0, 0, 0, 0.8),
+    -0.5px 1.5px 0px rgba(0, 0, 0, 0.8), 0px -1px 0px rgba(0, 0, 0, 0.8),
+    0px -0.5px 0px rgba(0, 0, 0, 0.8), 0px 0px 1px rgba(0, 0, 0, 0.8),
+    0px 0.5px 1px rgba(0, 0, 0, 0.8), 0px 1px 1px rgba(0, 0, 0, 0.8),
+    0px 1.5px 1px rgba(0, 0, 0, 0.8), 0.5px -1px 0px rgba(0, 0, 0, 0.8),
+    0.5px -0.5px 0px rgba(0, 0, 0, 0.8), 0.5px 0px 1px rgba(0, 0, 0, 0.8),
+    0.5px 0.5px 1px rgba(0, 0, 0, 0.8), 0.5px 1px 1px rgba(0, 0, 0, 0.8),
+    0.5px 1.5px 1px rgba(0, 0, 0, 0.8), 1px -1px 0px rgba(0, 0, 0, 0.8),
+    1px -0.5px 0px rgba(0, 0, 0, 0.8), 1px 0px 1px rgba(0, 0, 0, 0.8),
+    1px 0.5px 1px rgba(0, 0, 0, 0.8), 1px 1px 1px rgba(0, 0, 0, 0.8),
+    1px 1.5px 1px rgba(0, 0, 0, 0.8), 1.5px -1px 0px rgba(0, 0, 0, 0.8),
+    1.5px -0.5px 0px rgba(0, 0, 0, 0.8), 1.5px 0px 1.5px rgba(0, 0, 0, 0.8),
+    1.5px 0.5px 1.5px rgba(0, 0, 0, 0.8), 1.5px 1px 1.5px rgba(0, 0, 0, 0.8),
+    1.5px 1.5px 1.5px rgba(0, 0, 0, 0.8);
+  -webkit-font-smoothing: antialiased;
+  color: #17dd3f;
   font-size: 30px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
   text-align: center;
@@ -59,17 +78,13 @@
   position: relative;
   max-width: 100%;
   margin: 0;
-  padding: 0.8em 1em 0;
+  padding: 0em 1em 0;
 }
 
 /* 알림 이미지 관련 설정 */
 .swal2-image {
-  margin: 2em auto 1em auto;
+  margin: 0em auto 0em auto;
 
-  max-width: 100%;
-  width: auto;
-
-  max-height: 100%;
   height: 300px;
 
   display: flex;
@@ -81,40 +96,48 @@
 /* 구매 메세지 관련 설정 */
 .text {
   font-size: 28px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
-  color: inherit;
+  color: #44adec;
 }
 /* 닉네임 */
 .nick {
   font-size: 30px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
-  color: white;
+  color: #ffc247;
 }
 /* 수량 */
 .quantity {
   font-size: 30px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
-  color: white;
+  color: #ffc247;
 }
 /* 상품명 */
 .productName {
   font-size: 30px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
-  color: white;
+  color: #44adec;
 }
 /* 플마 */
 .point {
   font-size: 45px;
-  font-family: 'KCC-Ganpan';
+  font-family: "NanumSquareRound";
   font-weight: 600;
   font-style: normal;
   color: red;
+}
+/* BJ이름 */
+.bj {
+  font-size: 28px;
+  font-family: "NanumSquareRound";
+  font-weight: 600;
+  font-style: normal;
+  color: #ffc247;
 }

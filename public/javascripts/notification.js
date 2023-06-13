@@ -65,13 +65,15 @@ function tssDialogGen(data, script) {
   Object.keys(data).forEach(function (key) {
     reqUrl = reqUrl.replace('[' + key + ']', data[key])
   })
-  return reqUrl
+  // return reqUrl;
+  console.log('original ReqUrl', reqUrl)
+  return encodeURIComponent(reqUrl)
 }
 
 function alertTextGen(data, script) {
   var text = script.replace(/\./g, ' ')
   Object.keys(data).forEach(function (key) {
-    if (key == 'text' || key == 'bj' || key == 'productName') {
+    if (key == 'text' || key == 'productName') {
       text = text.replace(
         '[' + key + ']',
         `<br><span class="${key}">${data[key]}</span>`
@@ -120,7 +122,17 @@ async function tick() {
         reqUrl += '/' + data.SPEAKING_RATE + '/' + data.SPEAKING_VOICE
       })
 
-    var notiTextToSpeach = new Audio(reqUrl)
+    console.log(reqUrl)
+
+    var notiTextToSpeach
+    try {
+      notiTextToSpeach = new Audio(reqUrl)
+      setTimeout(() => {
+        return
+      }, 5000)
+    } catch (error) {
+      console.log(error)
+    }
 
     notiSound.load()
     notiTextToSpeach.load()
