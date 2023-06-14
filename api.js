@@ -237,13 +237,8 @@ module.exports = class ApiControls {
             let mappedData = response.data.data.lastChangeStatuses.map(
               (change) => change.productOrderId
             )
-            if (response.data.data.hasOwnProperty('more')) {
-              var more = await getMore(
-                response.data.data.more.moreFrom,
-                response.data.data.more.moreSequence
-              )
-
-              mappedData = [...mappedData, ...more]
+            if (mappedData.length > 300) {
+              mappedData.splice(300)
             }
             resolve(mappedData)
           } else {
@@ -303,7 +298,10 @@ module.exports = class ApiControls {
               for (var i in API.PRODUCT_ID) {
                 if (productOrder.productOrder.productId == API.PRODUCT_ID[i]) {
                   if (
-                    productOrder.productOrder.hasOwnProperty('placeOrderDate')
+                    productOrder.productOrder.hasOwnProperty(
+                      'placeOrderDate'
+                    ) &&
+                    !productOrder.productOrder.hasOwnProperty('claimType')
                   ) {
                     return true
                   }

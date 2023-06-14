@@ -65,8 +65,6 @@ function tssDialogGen(data, script) {
   Object.keys(data).forEach(function (key) {
     reqUrl = reqUrl.replace('[' + key + ']', data[key])
   })
-  // return reqUrl;
-  console.log('original ReqUrl', reqUrl)
   return encodeURIComponent(reqUrl)
 }
 
@@ -93,7 +91,6 @@ async function tick() {
 
   if (list.length > 0) {
     const el = list.shift()
-    console.log(el)
     var notiSound = new Audio()
     var notiText = ''
     var ttsReady = false
@@ -122,8 +119,6 @@ async function tick() {
         reqUrl += '/' + data.SPEAKING_RATE + '/' + data.SPEAKING_VOICE
       })
 
-    console.log(reqUrl)
-
     var notiTextToSpeach
     try {
       notiTextToSpeach = new Audio(reqUrl)
@@ -148,9 +143,9 @@ async function tick() {
 
     function checkBothAudiosReady() {
       if (soundReady && ttsReady) {
-        console.log('both audios are Ready')
-        console.log(notiSound.duration)
-        console.log(notiTextToSpeach.duration)
+        console.log(
+          `both audios are Ready / Alarm Sound Duration : ${notiSound.duration} / TTS Duration : ${notiTextToSpeach.duration}`
+        )
 
         var timer =
           Math.floor(notiSound.duration * 1000) +
